@@ -1,2 +1,5 @@
-#Shop Multi vendor Service
-###Description: `Service description goes here`
+Shop Multi vendor Service
+--
+> Description:
+
+Service description goes here
