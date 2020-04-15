@@ -1,0 +1,44 @@
+version: '3.3'
+services:
+  vendors-sync:
+    build: .
+    image: 'shop/vendors'
+    volumes:
+      - .:/var/www/html
+    env_file:
+      - .env
+    command: >
+      bash -c ""
+  vendors-async:
+    build: .
+    image: 'shop/vendors'
+    volumes:
+      - .:/var/www/html
+    env_file:
+      - .env
+    command: >
+      bash -c ""
+  vendors-api:
+    build: .
+    image: 'shop/vendors'
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    env_file:
+      - .env
+    ports:
+      - "1002:8000"
+    command: ""
+  vendors-unit-test:
+    build: .
+    container_name: 'unit-test'
+    image: 'shop/vendors'
+    volumes:
+      - .:/var/www/html
+    command: >
+      bash -c ""
+
+networks:
+  default:
+    external:
+      name: marketplace-network
