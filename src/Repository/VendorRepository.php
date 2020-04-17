@@ -19,16 +19,31 @@ class VendorRepository extends ServiceEntityRepository
         parent::__construct($registry, Vendor::class);
     }
 
+    /**
+     * @param string $ownerId
+     * @return Vendor
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function create(string $ownerId): Vendor
+    {
+        $model = new Vendor();
+        $model->setOwnerId($ownerId);
+        $this->getEntityManager()->persist($model);
+        $this->getEntityManager()->flush();
+
+        return $model;
+    }
+
     // /**
-    //  * @return Vendor[] Returns an array of Vendor objects
+    //  * @return X[] Returns an array of X objects
     //  */
     /*
     public function findByExampleField($value)
     {
-        return $this->createQueryBuilder('v')
-            ->andWhere('v.exampleField = :val')
+        return $this->createQueryBuilder('x')
+            ->andWhere('x.exampleField = :val')
             ->setParameter('val', $value)
-            ->orderBy('v.id', 'ASC')
+            ->orderBy('x.id', 'ASC')
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()
@@ -37,10 +52,10 @@ class VendorRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?Vendor
+    public function findOneBySomeField($value): ?X
     {
-        return $this->createQueryBuilder('v')
-            ->andWhere('v.exampleField = :val')
+        return $this->createQueryBuilder('x')
+            ->andWhere('x.exampleField = :val')
             ->setParameter('val', $value)
             ->getQuery()
             ->getOneOrNullResult()

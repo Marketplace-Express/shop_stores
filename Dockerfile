@@ -30,6 +30,12 @@ COPY php_extensions/*.ini /usr/local/etc/php/conf.d/
 # Return working directory to its default state
 WORKDIR /var/www/html
 # Copy project files to container
-ADD *.* ./
-# Install composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+ADD . ./
+# Install composer & dependencies
+RUN rm -rf vendor composer.lock && \
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    composer clearcache && \
+    composer config -g github-oauth.github.com 3f6fd65b0d7958581f549b862ee49af9db1bcdf1 && \
+    composer install
+# Run migrations, todo: remove --allow-no-migration
+RUN php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
