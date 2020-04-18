@@ -30,11 +30,10 @@ final class Version20200416221820 extends AbstractMigration
         $table->addColumn('created_at', 'datetime')->setDefault('CURRENT_TIMESTAMP');
         $table->addColumn('updated_at', 'datetime')->setNotnull(false);
         $table->addColumn('deleted_at', 'datetime')->setNotnull(false);
-        $table->addColumn('is_deleted', 'boolean')->setDefault(false);
         $table->setPrimaryKey(['vendor_id']);
 
         // Create filtration index
-        $table->addIndex(['vendor_id', 'owner_id', 'is_deleted'], 'filter_index');
+        $table->addIndex(['vendor_id', 'owner_id', 'deleted_at'], 'filter_index');
     }
 
     public function down(Schema $schema) : void

@@ -3,28 +3,32 @@
 namespace App\Entity;
 
 
-use App\Traits\TimeStampable;
+use App\Entity\Interfaces\ArrayData;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\VendorRepository")
  * @ORM\Table(name="vendors")
+ * @Gedmo\SoftDeleteable()
  */
-class Vendor
+class Vendor implements ArrayData
 {
-    use TimeStampable;
+    use TimestampableEntity, SoftDeleteableEntity;
 
     /**
      * @ORM\GeneratedValue(strategy="UUID")
-     * @ORM\Column(name="vendor_id", type="string", length=36)
+     * @ORM\Column(type="string", length=36)
      * @ORM\Id()
      */
-    private $vendorId;
+    protected $vendorId;
 
     /**
-     * @ORM\Column(name="owner_id", type="string", length=36)
+     * @ORM\Column(type="string", length=36)
      */
-    private $ownerId;
+    protected $ownerId;
 
     /**
      * @return string|null
@@ -51,5 +55,16 @@ class Vendor
         $this->ownerId = $ownerId;
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function toApiArray(): array
+    {
+        return [
+            'vendorId' => $this->vendorId,
+            'ownerId' => $this->ownerId
+        ];
     }
 }

@@ -7,6 +7,7 @@ use App\Controller\Validator\Vendor\CreateConstraints;
 use App\Controller\Validator\Vendor\DeleteConstraints;
 use App\Exception\ValidationFailed;
 use App\Repository\VendorRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -22,11 +23,11 @@ class VendorController extends BaseController
 
     /**
      * VendorController constructor.
-     * @param VendorRepository $repository
+     * @param EntityManagerInterface $entityManager
      */
-    public function __construct(VendorRepository $repository)
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->repository = $repository;
+        $this->repository = $entityManager->getRepository('App:Vendor');
     }
 
     /**
@@ -40,7 +41,8 @@ class VendorController extends BaseController
 
         try {
             $this->validateRequest($data, new CreateConstraints());
-            $response = $this->getSuccessResponseScheme($this->repository->create($data['ownerId']));
+            $vendor = $this->repository->create($data['ownerId']);
+            $response = $this->getSuccessResponseScheme($vendor->toApiArray());
         } catch (ValidationFailed $exception) {
             $response = $this->getErrorResponseScheme($exception->errors, 400);
         } catch (\Throwable $exception) {
