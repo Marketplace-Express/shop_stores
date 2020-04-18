@@ -33,10 +33,23 @@ class BaseController extends AbstractController
      * @param int $code
      * @return array
      */
-    public function getErrorResponse($message, int $code): array
+    public function getErrorResponseScheme($message, int $code): array
     {
         return [
             'status' => $code,
+            'message' => $message
+        ];
+    }
+
+    /**
+     * @param $message
+     * @param int $code
+     * @return array
+     */
+    public function getSuccessResponseScheme($message, int $code = 200): array
+    {
+        return [
+            'status' => 200,
             'message' => $message
         ];
     }

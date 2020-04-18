@@ -3,7 +3,8 @@
 namespace App\Controller;
 
 
-use App\Controller\Validator\VendorConstraints;
+use App\Controller\Validator\Vendor\CreateConstraints;
+use App\Controller\Validator\Vendor\DeleteConstraints;
 use App\Exception\ValidationFailed;
 use App\Repository\VendorRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,12 +39,31 @@ class VendorController extends BaseController
         $data = json_decode($request->getContent(), true);
 
         try {
-            $this->validateRequest($data, new VendorConstraints());
-            $response = $this->repository->create($data['ownerId']);
+            $this->validateRequest($data, new CreateConstraints());
+            $response = $this->getSuccessResponseScheme($this->repository->create($data['ownerId']));
         } catch (ValidationFailed $exception) {
-            $response = $this->getErrorResponse($exception->errors, 400);
+            $response = $this->getErrorResponseScheme($exception->errors, 400);
         } catch (\Throwable $exception) {
-            $response = $this->getErrorResponse($exception->getMessage(), 500);
+            $response = $this->getErrorResponseScheme($exception->getMessage(), 500);
+        }
+
+        return $this->json($response);
+    }
+
+    /**
+     * @Route("/{vendorId}", methods={"DELETE"})
+     * @param string $vendorId
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function delete(string $vendorId)
+    {
+        try {
+            $this->validateRequest(['vendorId' => $vendorId], new DeleteConstraints());
+            $response = $this->getSuccessResponseScheme($this->repository->delete($vendorId));
+        } catch (ValidationFailed $exception) {
+            $response = $this->getErrorResponseScheme($exception->errors, 400);
+        } catch (\Throwable $exception) {
+            $response = $this->getErrorResponseScheme($exception->getMessage(), 500);
         }
 
         return $this->json($response);

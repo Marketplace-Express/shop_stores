@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Vendor;
+use App\Exception\NotFound;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -32,6 +33,27 @@ class VendorRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
 
         return $model;
+    }
+
+    /**
+     * @param string $vendorId
+     * @param string $ownerId
+     * @return bool
+     * @throws NotFound
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function delete(string $vendorId, string $ownerId = null)
+    {
+        $vendor = $this->find($vendorId);
+
+        if (!$vendor) {
+            throw new NotFound();
+        }
+
+        $this->getEntityManager()->remove($vendor);
+        $this->getEntityManager()->flush();
+
+        return true;
     }
 
     // /**

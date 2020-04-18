@@ -8,7 +8,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\VendorRepository")
- * @ORM\HasLifecycleCallbacks
  * @ORM\Table(name="vendors")
  */
 class Vendor

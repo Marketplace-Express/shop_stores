@@ -1,15 +1,13 @@
 version: '3.3'
 services:
   vendors-api:
-    build: .
-    image: 'shop/vendors'
-    working_dir: /var/www/html
+    image: 'registry.gitlab.com/shop_ecommerce/shop_vendors'
+    command: symfony serve
     volumes:
-      - .:/var/www/html
+      - .:/src
+      - /src/vendor
     ports:
       - "1002:8000"
-    command: >
-      bash -c "symfony serve"
     environment:
       - PHP_IDE_CONFIG=serverName=docker
 

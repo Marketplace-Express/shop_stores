@@ -1,14 +1,15 @@
 <?php
 
 
-namespace App\Controller\Validator;
+namespace App\Controller\Validator\Vendor;
 
 
+use App\Controller\Validator\InputConstraints;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Uuid;
 
-class VendorConstraints implements InputConstraints
+class CreateConstraints implements InputConstraints
 {
     /**
      * @return Collection
