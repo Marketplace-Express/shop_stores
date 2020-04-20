@@ -7,7 +7,7 @@ use App\Entity\Interfaces\ArrayData;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
-use Gedmo\Timestampable\Traits\TimestampableEntity;
+use Gedmo\Timestampable\Traits\Timestampable;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\VendorRepository")
@@ -16,7 +16,7 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
  */
 class Vendor implements ArrayData
 {
-    use TimestampableEntity, SoftDeleteableEntity;
+    use Timestampable, SoftDeleteableEntity;
 
     /**
      * @ORM\GeneratedValue(strategy="UUID")

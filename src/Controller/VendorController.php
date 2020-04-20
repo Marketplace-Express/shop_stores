@@ -5,6 +5,8 @@ namespace App\Controller;
 
 use App\Controller\Validator\Vendor\CreateConstraints;
 use App\Controller\Validator\Vendor\DeleteConstraints;
+use App\Controller\Validator\Vendor\GetByIdConstraint;
+use App\Exception\NotFound;
 use App\Exception\ValidationFailed;
 use App\Repository\VendorRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -64,6 +66,29 @@ class VendorController extends BaseController
             $response = $this->getSuccessResponseScheme($this->repository->delete($vendorId));
         } catch (ValidationFailed $exception) {
             $response = $this->getErrorResponseScheme($exception->errors, 400);
+        } catch (NotFound $exception) {
+            $response = $this->getErrorResponseScheme($exception->getMessage(), 404);
+        } catch (\Throwable $exception) {
+            $response = $this->getErrorResponseScheme($exception->getMessage(), 500);
+        }
+
+        return $this->json($response);
+    }
+
+    /**
+     * @param string $vendorId
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @Route("/{vendorId}", methods={"GET"})
+     */
+    public function getById(string $vendorId)
+    {
+        try {
+            $this->validateRequest(['vendorId' => $vendorId], new GetByIdConstraint());
+            $response = $this->getSuccessResponseScheme($this->repository->getById($vendorId)->toApiArray());
+        } catch (ValidationFailed $exception) {
+            $response = $this->getErrorResponseScheme($exception->getMessage(), 400);
+        } catch (NotFound $exception) {
+            $response = $this->getErrorResponseScheme($exception->getMessage(), 404);
         } catch (\Throwable $exception) {
             $response = $this->getErrorResponseScheme($exception->getMessage(), 500);
         }

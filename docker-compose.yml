@@ -10,6 +10,8 @@ services:
       - "1002:8000"
     environment:
       - PHP_IDE_CONFIG=serverName=docker
+    external_links:
+      - marketplace-mysql
 
 networks:
   default:

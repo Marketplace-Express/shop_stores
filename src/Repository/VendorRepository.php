@@ -56,6 +56,22 @@ class VendorRepository extends ServiceEntityRepository
         return true;
     }
 
+    /**
+     * @param string $vendorId
+     * @return Vendor
+     * @throws NotFound
+     */
+    public function getById(string $vendorId): Vendor
+    {
+        $vendor = $this->find($vendorId);
+
+        if (!$vendor) {
+            throw new NotFound();
+        }
+
+        return $vendor;
+    }
+
     // /**
     //  * @return X[] Returns an array of X objects
     //  */
