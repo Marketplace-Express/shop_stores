@@ -1,6 +1,6 @@
 version: '3.3'
 services:
-  vendors-api:
+  stores-api:
     image: 'registry.gitlab.com/shop_ecommerce/shop_stores'
     command: symfony serve
     volumes:
