@@ -8,28 +8,29 @@ use App\Controller\Validator\Vendor\DeleteConstraints;
 use App\Controller\Validator\Vendor\GetByIdConstraint;
 use App\Exception\NotFound;
 use App\Exception\ValidationFailed;
-use App\Repository\VendorRepository;
+use App\Repository\StoreRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Class VendorController
+ * Class StoreController
  * @package App\Controller
- * @Route("/api/vendor", name="api_vendor_")
+ * @Route("/api/store", name="api_store_")
  */
-class VendorController extends BaseController
+class StoreController extends BaseController
 {
-    /** @var VendorRepository */
+    /** @var StoreRepository */
     private $repository;
 
     /**
-     * VendorController constructor.
+     * StoreController constructor.
      * @param EntityManagerInterface $entityManager
      */
     public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->repository = $entityManager->getRepository('App:Vendor');
+        $this->repository = $entityManager->getRepository('App:Store');
     }
 
     /**
@@ -43,8 +44,16 @@ class VendorController extends BaseController
 
         try {
             $this->validateRequest($data, new CreateConstraints());
-            $vendor = $this->repository->create($data['ownerId']);
-            $response = $this->getSuccessResponseScheme($vendor->toApiArray());
+            $store = $this->repository->create(
+                $data['ownerId'],
+                $data['name'],
+                $data['description'],
+                $data['type'],
+                $data['photo'],
+                $data['coverPhoto'],
+                $data['location']
+            );
+            $response = $this->getSuccessResponseScheme($store->toApiArray());
         } catch (ValidationFailed $exception) {
             $response = $this->getErrorResponseScheme($exception->errors, 400);
         } catch (\Throwable $exception) {
@@ -55,15 +64,16 @@ class VendorController extends BaseController
     }
 
     /**
-     * @Route("/{vendorId}", methods={"DELETE"})
-     * @param string $vendorId
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @Route("/{storeId}", methods={"DELETE"})
+     * @param string $storeId
+     * @return \Symfony\Component\HttpFoundation\Response|void
      */
-    public function delete(string $vendorId)
+    public function delete(string $storeId)
     {
         try {
-            $this->validateRequest(['vendorId' => $vendorId], new DeleteConstraints());
-            $response = $this->getSuccessResponseScheme($this->repository->delete($vendorId));
+            $this->validateRequest(['storeId' => $storeId], new DeleteConstraints());
+            $this->repository->delete($storeId);
+            return new Response(null, 204);
         } catch (ValidationFailed $exception) {
             $response = $this->getErrorResponseScheme($exception->errors, 400);
         } catch (NotFound $exception) {
@@ -76,15 +86,15 @@ class VendorController extends BaseController
     }
 
     /**
-     * @param string $vendorId
+     * @param string $storeId
      * @return \Symfony\Component\HttpFoundation\JsonResponse
-     * @Route("/{vendorId}", methods={"GET"})
+     * @Route("/{storeId}", methods={"GET"})
      */
-    public function getById(string $vendorId)
+    public function getById(string $storeId)
     {
         try {
-            $this->validateRequest(['vendorId' => $vendorId], new GetByIdConstraint());
-            $response = $this->getSuccessResponseScheme($this->repository->getById($vendorId)->toApiArray());
+            $this->validateRequest(['storeId' => $storeId], new GetByIdConstraint());
+            $response = $this->getSuccessResponseScheme($this->repository->getById($storeId)->toApiArray());
         } catch (ValidationFailed $exception) {
             $response = $this->getErrorResponseScheme($exception->getMessage(), 400);
         } catch (NotFound $exception) {

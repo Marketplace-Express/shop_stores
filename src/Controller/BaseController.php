@@ -49,7 +49,7 @@ class BaseController extends AbstractController
     public function getSuccessResponseScheme($message, int $code = 200): array
     {
         return [
-            'status' => 200,
+            'status' => $code,
             'message' => $message
         ];
     }

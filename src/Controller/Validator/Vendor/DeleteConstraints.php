@@ -18,7 +18,7 @@ class DeleteConstraints implements InputConstraints
     public function getConstraints(): Collection
     {
         return new Collection([
-            'vendorId' => [new Uuid(), new NotBlank()]
+            'storeId' => [new NotBlank(), new Uuid()]
         ]);
     }
 }
