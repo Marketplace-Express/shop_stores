@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Controller\Validator\Vendor;
+namespace App\Controller\Validator\Store;
 
 
 use App\Controller\Validator\InputConstraints;

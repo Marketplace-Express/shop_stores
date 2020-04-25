@@ -49,9 +49,9 @@ class Location implements ArrayData
         return $this->coordinates;
     }
 
-    public function setCoordinates(?string $coordinates): self
+    public function setCoordinates(array $coordinates = []): self
     {
-        $this->coordinates = $coordinates;
+        $this->coordinates = implode(", ", $coordinates);
 
         return $this;
     }

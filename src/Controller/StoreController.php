@@ -3,9 +3,10 @@
 namespace App\Controller;
 
 
-use App\Controller\Validator\Vendor\CreateConstraints;
-use App\Controller\Validator\Vendor\DeleteConstraints;
-use App\Controller\Validator\Vendor\GetByIdConstraint;
+use App\Controller\Validator\Store\CreateConstraints;
+use App\Controller\Validator\Store\DeleteConstraints;
+use App\Controller\Validator\Store\GetByIdConstraint;
+use App\Controller\Validator\Store\UpdateConstraint;
 use App\Exception\NotFound;
 use App\Exception\ValidationFailed;
 use App\Repository\StoreRepository;
@@ -99,6 +100,35 @@ class StoreController extends BaseController
             $response = $this->getErrorResponseScheme($exception->getMessage(), 400);
         } catch (NotFound $exception) {
             $response = $this->getErrorResponseScheme($exception->getMessage(), 404);
+        } catch (\Throwable $exception) {
+            $response = $this->getErrorResponseScheme($exception->getMessage(), 500);
+        }
+
+        return $this->json($response);
+    }
+
+    /**
+     * @param string $storeId
+     * @param Request $request
+     * @Route("/{storeId}", methods={"PUT"})
+     */
+    public function update(string $storeId, Request $request)
+    {
+        $data = json_decode($request->getContent(), true);
+
+        try {
+            $this->validateRequest($data, new UpdateConstraint());
+            $store = $this->repository->update(
+                $storeId,
+                $data['name'],
+                $data['description'],
+                $data['location'],
+                $data['photo'],
+                $data['coverPhoto']
+            );
+            $response = $this->getSuccessResponseScheme($store->toApiArray());
+        } catch (ValidationFailed $exception) {
+            $response = $this->getErrorResponseScheme($exception->errors, 400);
         } catch (\Throwable $exception) {
             $response = $this->getErrorResponseScheme($exception->getMessage(), 500);
         }
