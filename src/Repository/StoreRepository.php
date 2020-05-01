@@ -7,8 +7,13 @@ use App\Entity\Sort\SortStore;
 use App\Entity\Store;
 use App\Exception\DisabledEntity;
 use App\Exception\NotFound;
+use App\Logger\DbLogger;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Symfony\Bridge\Doctrine\Logger\DbalLogger;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * @method Store|null find($id, $lockMode = null, $lockVersion = null)
@@ -18,8 +23,18 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class StoreRepository extends ServiceEntityRepository
 {
+    /** @var \Doctrine\DBAL\Logging\DebugStack() */
+    private $logger;
+
     public function __construct(ManagerRegistry $registry)
     {
+        // Enable DQL debugging in dev environment
+        if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] == 'dev') {
+            $registry->getConnection()->getConfiguration()->setSQLLogger(
+                $this->logger = new DbalLogger(new Logger('queries', [new DbLogger()]), new Stopwatch())
+            );
+        }
+
         parent::__construct($registry, Store::class);
     }
 
@@ -73,6 +88,7 @@ class StoreRepository extends ServiceEntityRepository
      * @param bool $getDisabled
      * @return Store|null
      * @throws NotFound
+     * @throws DisabledEntity
      */
     public function getById(string $storeId, bool $getDisabled = false): ?Store
     {
@@ -191,7 +207,6 @@ class StoreRepository extends ServiceEntityRepository
 
         $more = false;
         $stores = $this->findBy([], $sort->getSqlSort(), $limit+1, ($page - 1) * $limit);
-
 
         if (count($stores) > $limit) {
             array_pop($stores);

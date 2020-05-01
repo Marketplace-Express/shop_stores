@@ -44,6 +44,7 @@ final class Version20200420223709 extends AbstractMigration
 
         // Create unique index
         $table->addUniqueIndex(['store_id', 'owner_id'], 'unique_store_index');
+        $table->addUniqueIndex(['location_id'], 'unique_location_index');
     }
 
     public function down(Schema $schema) : void
