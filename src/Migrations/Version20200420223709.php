@@ -35,8 +35,11 @@ final class Version20200420223709 extends AbstractMigration
         $table->addColumn('orders_count', 'integer');
         $table->addColumn('photo', 'string');
         $table->addColumn('cover_photo', 'string');
+        $table->addColumn('disable_reason', 'integer')->setLength(1)->setNotnull(false);
+        $table->addColumn('disable_comment', 'string')->setNotnull(false);
         $table->addColumn('created_at', 'datetime');
         $table->addColumn('updated_at', 'datetime')->setNotnull(false);
+        $table->addColumn('disabled_at', 'datetime')->setNotnull(false);
         $table->addColumn('deleted_at', 'datetime')->setNotnull(false);
 
         // Create unique index

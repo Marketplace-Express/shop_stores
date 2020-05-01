@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Uuid;
 
-class DeleteConstraints implements InputConstraints
+class DeleteConstraint implements InputConstraints
 {
 
     /**

@@ -12,11 +12,12 @@ abstract class CommonDataValidator
      * @param $text
      * @param ExecutionContext $context
      * @param string $field
+     * @param array $allowedTags
      * @return bool
      */
-    protected function validateDescriptionAndName($text, ExecutionContext $context, string $field): bool
+    protected function validateText($text, ExecutionContext $context, string $field, array $allowedTags = []): bool
     {
-        if ($text != strip_tags($text)) {
+        if ($text != strip_tags($text, join($allowedTags))) {
             $context->addViolation(sprintf('%s contains invalid characters', $field));
             return false;
         }

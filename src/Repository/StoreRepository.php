@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Location;
+use App\Entity\Sort\SortStore;
 use App\Entity\Store;
+use App\Exception\DisabledEntity;
 use App\Exception\NotFound;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -40,7 +42,7 @@ class StoreRepository extends ServiceEntityRepository
         int $type,
         string $photo,
         string $coverPhoto,
-        array $locationData = []
+        ?array $locationData
     )
     {
         $store = new Store();
@@ -68,15 +70,17 @@ class StoreRepository extends ServiceEntityRepository
 
     /**
      * @param string $storeId
+     * @param bool $getDisabled
      * @return Store|null
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\TransactionRequiredException
      * @throws NotFound
      */
-    public function getById(string $storeId): ?Store
+    public function getById(string $storeId, bool $getDisabled = false): ?Store
     {
-        $store = $this->getEntityManager()->find($this->getClassName(), $storeId);
+        // Whether to get disabled store or not
+        $this->getEntityManager()->getConfiguration()->setDefaultQueryHint('withDisabled', $getDisabled);
+
+        /** @var Store|null $store */
+        $store = $this->find($storeId);
 
         if (!$store) {
             throw new NotFound();
@@ -87,14 +91,34 @@ class StoreRepository extends ServiceEntityRepository
 
     /**
      * @param string $storeId
+     * @param int $disableReason
+     * @param string|null $disableComment
      * @throws NotFound
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\TransactionRequiredException
+     * @throws DisabledEntity
+     */
+    public function disable(string $storeId, int $disableReason, ?string $disableComment = null)
+    {
+        $store = $this->getById($storeId);
+
+        $store->setDisableReason($disableReason);
+        $store->setDisableComment($disableComment);
+
+        $this->getEntityManager()->persist($store);
+        $this->getEntityManager()->flush();
+    }
+
+    /**
+     * @param string $storeId
+     * @throws NotFound
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws DisabledEntity
      */
     public function delete(string $storeId)
     {
-        $this->getEntityManager()->remove($this->getById($storeId));
+        $this->getEntityManager()->remove($this->getById($storeId, true));
         $this->getEntityManager()->flush();
     }
 
@@ -110,6 +134,7 @@ class StoreRepository extends ServiceEntityRepository
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
+     * @throws DisabledEntity
      */
     public function update(
         string $storeId,
@@ -150,6 +175,33 @@ class StoreRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
 
         return $store;
+    }
+
+    /**
+     * @param int $page
+     * @param int $limit
+     * @param SortStore|null $sort
+     * @return array
+     * @throws \Exception
+     */
+    public function getAll(int $page = 1 , int $limit = 10, ?SortStore $sort = null): array
+    {
+        // Get disabled stores
+        $this->getEntityManager()->getConfiguration()->setDefaultQueryHint('withDisabled', true);
+
+        $more = false;
+        $stores = $this->findBy([], $sort->getSqlSort(), $limit+1, ($page - 1) * $limit);
+
+
+        if (count($stores) > $limit) {
+            array_pop($stores);
+            $more = true;
+        }
+
+        return [
+            'stores' => $stores,
+            'more' => $more
+        ];
     }
 
     // /**

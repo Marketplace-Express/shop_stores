@@ -4,7 +4,7 @@
 namespace App\Enums;
 
 
-class StoreType implements EnumInterface
+class StoreType extends AbstractEnum
 {
     const TYPE_PHYSICAL = 0;
     const TYPE_VIRTUAL = 1;

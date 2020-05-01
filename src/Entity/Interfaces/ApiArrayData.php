@@ -4,7 +4,7 @@
 namespace App\Entity\Interfaces;
 
 
-interface ArrayData
+interface ApiArrayData
 {
     public function toApiArray(): array;
 }

@@ -25,10 +25,10 @@ class CreateConstraints extends CommonDataValidator implements InputConstraints
         return new Collection([
             'ownerId' => [new Uuid(), new NotBlank()],
             'name' => [new NotBlank(), new Length(['max' => 100]), new Callback(['callback' => function ($name, ExecutionContext $context) {
-                return $this->validateDescriptionAndName($name, $context, 'name');
+                return $this->validateText($name, $context, 'name');
             }])],
             'description' => [new Length(['allowEmptyString' => true, 'min' => 5]), new Callback(['callback' => function ($text, ExecutionContext $context) {
-                return $this->validateDescriptionAndName($text, $context, 'description');
+                return $this->validateText($text, $context, 'description');
             }])],
             'type' => [new Choice(['choices' => StoreType::getValues()])],
             'location' => [new Callback(['callback' => function ($location, ExecutionContext $context) {

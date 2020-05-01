@@ -2,15 +2,15 @@
 
 namespace App\Entity;
 
-use App\Entity\Interfaces\ArrayData;
+use App\Entity\Interfaces\ApiArrayData;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\LocationRepository")
+ * @ORM\Entity()
  * @ORM\Table(name="locations")
  */
-class Location implements ArrayData
+class Location implements ApiArrayData
 {
     use TimestampableEntity;
 

@@ -2,7 +2,11 @@
 
 namespace App\Entity;
 
-use App\Entity\Interfaces\ArrayData;
+
+use App\Entity\Filter\Disable\Traits\DisableTrait;
+use App\Entity\Interfaces\ApiArrayData;
+use App\Entity\Interfaces\DisableInterface;
+use App\Enums\DisableReasonEnum;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
@@ -11,11 +15,12 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\StoreRepository")
  * @ORM\Table(name="stores")
+ *
  * @Gedmo\SoftDeleteable()
  */
-class Store implements ArrayData
+class Store implements ApiArrayData, DisableInterface
 {
-    use TimestampableEntity, SoftDeleteableEntity;
+    use TimestampableEntity, SoftDeleteableEntity, DisableTrait;
 
     /**
      * @var string
@@ -98,6 +103,20 @@ class Store implements ArrayData
      * @ORM\Column(type="string", nullable=true)
      */
     private $coverPhoto;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(type="smallint")
+     */
+    private $disableReason;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="text")
+     */
+    private $disableComment;
 
     public function getStoreId(): string
     {
@@ -229,22 +248,75 @@ class Store implements ArrayData
     }
 
     /**
+     * @return int|null
+     */
+    public function getDisableReason(): ?int
+    {
+        return $this->disableReason;
+    }
+
+    /**
+     * @param int $disableReason
+     */
+    public function setDisableReason(int $disableReason): void
+    {
+        $this->disableReason = $disableReason;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDisableComment(): ?string
+    {
+        return $this->disableComment;
+    }
+
+    /**
+     * @param string $disableComment
+     */
+    public function setDisableComment(string $disableComment): void
+    {
+        $this->disableComment = $disableComment;
+    }
+
+    private function locationToApiArray(): array
+    {
+        if ($this->location) {
+            return $this->location->toApiArray();
+        }
+
+        return [];
+    }
+
+    private function getDisableData(): array
+    {
+        return [
+            'disabledAt' => $this->disabledAt,
+            'disableReason' => DisableReasonEnum::getKey($this->disableReason),
+            'disableComment' => $this->disableComment
+        ];
+    }
+
+    /**
      * @return array
      */
     public function toApiArray(): array
     {
-        return [
-            'storeId' => $this->storeId,
-            'ownerId' => $this->ownerId,
-            'name' => $this->name,
-            'description' => $this->description,
-            'location' => $this->location->toApiArray(),
-            'productsCount' => $this->productsCount,
-            'followersCount' => $this->followersCount,
-            'ordersCount' => $this->ordersCount,
-            'photo' => $this->photo,
-            'coverPhoto' => $this->coverPhoto,
-            'createdAt' => $this->createdAt
-        ];
+        return array_merge(
+            [
+                'storeId' => $this->storeId,
+                'ownerId' => $this->ownerId,
+                'name' => $this->name,
+                'description' => $this->description,
+                'location' => $this->locationToApiArray(),
+                'productsCount' => $this->productsCount,
+                'followersCount' => $this->followersCount,
+                'ordersCount' => $this->ordersCount,
+                'photo' => $this->photo,
+                'coverPhoto' => $this->coverPhoto,
+                'createdAt' => $this->createdAt
+            ],
+            $this->isDisabled() ? $this->getDisableData() : []
+        );
     }
 }

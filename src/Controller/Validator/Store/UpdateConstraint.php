@@ -19,10 +19,10 @@ class UpdateConstraint extends CommonDataValidator implements InputConstraints
     {
         return new Collection([
             'name' => [new Length(['allowEmptyString' => true, 'max' => 100]), new Callback(['callback' => function ($name, ExecutionContext $context) {
-                return $this->validateDescriptionAndName($name, $context, 'name');
+                return $this->validateText($name, $context, 'name');
             }])],
             'description' => [new Length(['allowEmptyString' => true, 'min' => 5]), new Callback(['callback' => function ($text, ExecutionContext $context) {
-                return $this->validateDescriptionAndName($text, $context, 'description');
+                return $this->validateText($text, $context, 'description');
             }])],
             'location' => [new Callback(['callback' => function ($location, ExecutionContext $context) {
                 return $this->validateLocation($location, $context);
