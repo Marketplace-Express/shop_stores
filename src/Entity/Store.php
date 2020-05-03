@@ -1,4 +1,9 @@
 <?php
+/**
+ * User: Wajdi Jurry
+ * Date: 24/04/2020
+ * Time: ٢:٣٥ ص
+ */
 
 namespace App\Entity;
 
@@ -7,6 +12,8 @@ use App\Entity\Filter\Disable\Traits\DisableTrait;
 use App\Entity\Interfaces\ApiArrayData;
 use App\Entity\Interfaces\DisableInterface;
 use App\Enums\DisableReasonEnum;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
@@ -117,6 +124,25 @@ class Store implements ApiArrayData, DisableInterface
      * @ORM\Column(type="text")
      */
     private $disableComment;
+
+    /**
+     * @ORM\OneToMany(
+     *     targetEntity="App\Entity\Follower",
+     *     mappedBy="store",
+     *     orphanRemoval=true,
+     *     cascade={"persist"}
+     * )
+     */
+    private $followers;
+
+    /**
+     * Store constructor.
+     */
+    public function __construct()
+    {
+        $this->followers = new ArrayCollection();
+    }
+
 
     public function getStoreId(): string
     {
@@ -286,6 +312,37 @@ class Store implements ApiArrayData, DisableInterface
         }
 
         return [];
+    }
+
+    /**
+     * @return Follower[]|Collection
+     */
+    public function getFollowers(): Collection
+    {
+        return $this->followers;
+    }
+
+    public function addFollower(Follower $follower): self
+    {
+        if (!$this->followers->contains($follower)) {
+            $this->followers[] = $follower;
+            $follower->setStore($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFollower(Follower $follower): self
+    {
+        if ($this->followers->contains($follower)) {
+            $this->followers->removeElement($follower);
+            // set the owning side to null (unless already changed)
+            if ($follower->getStore() === $this) {
+                $follower->setStore(null);
+            }
+        }
+
+        return $this;
     }
 
     private function getDisableData(): array

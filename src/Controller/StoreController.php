@@ -64,11 +64,11 @@ class StoreController extends BaseController
                 $data['coverPhoto'],
                 $data['location']
             );
-            $response = $this->getSuccessResponseScheme($store->toApiArray());
+            $response = $this->getResponseScheme($store->toApiArray());
         } catch (ValidationFailed $exception) {
-            $response = $this->getErrorResponseScheme($exception->errors, 400);
+            $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (\Throwable $exception) {
-            $response = $this->getErrorResponseScheme($exception->getMessage(), 500);
+            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return $this->json($response, $response['status']);
@@ -90,13 +90,13 @@ class StoreController extends BaseController
             $this->repository->disable($storeId, $data['disableReason'], $data['disableComment']);
             return new Response(null, 204);
         } catch (ValidationFailed $exception) {
-            $response = $this->getErrorResponseScheme($exception->errors, 400);
+            $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (NotFound $exception) {
-            $response = $this->getErrorResponseScheme($exception->getMessage(), 404);
+            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_NOT_FOUND);
         } catch (DisabledEntity $exception) {
-            $response = $this->getErrorResponseScheme($exception->getMessage(), 422);
+            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (\Throwable $exception) {
-            $response = $this->getErrorResponseScheme($exception->getMessage(), 500);
+            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return $this->json($response, $response['status']);
@@ -112,15 +112,15 @@ class StoreController extends BaseController
     {
         try {
             $this->validateRequest(['storeId' => $storeId], new GetByIdConstraint());
-            $response = $this->getSuccessResponseScheme($this->repository->getById($storeId)->toApiArray());
+            $response = $this->getResponseScheme($this->repository->getById($storeId)->toApiArray());
         } catch (ValidationFailed $exception) {
-            $response = $this->getErrorResponseScheme($exception->getMessage(), 400);
+            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_BAD_REQUEST);
         } catch (NotFound $exception) {
-            $response = $this->getErrorResponseScheme($exception->getMessage(), 404);
+            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_NOT_FOUND);
         } catch (DisabledEntity $exception) {
-            $response = $this->getErrorResponseScheme($exception->getMessage(), 422);
+            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (\Throwable $exception) {
-            $response = $this->getErrorResponseScheme($exception->getMessage(), 500);
+            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return $this->json($response, $response['status']);
@@ -146,15 +146,15 @@ class StoreController extends BaseController
                 $data['photo'],
                 $data['coverPhoto']
             );
-            $response = $this->getSuccessResponseScheme($store->toApiArray());
+            $response = $this->getResponseScheme($store->toApiArray());
         } catch (ValidationFailed $exception) {
-            $response = $this->getErrorResponseScheme($exception->errors, 400);
+            $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (NotFound $exception) {
-            $response = $this->getErrorResponseScheme($exception->getMessage(), 404);
+            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_NOT_FOUND);
         } catch (DisabledEntity $exception) {
-            $response = $this->getErrorResponseScheme($exception->getMessage(), 422);
+            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (\Throwable $exception) {
-            $response = $this->getErrorResponseScheme($exception->getMessage(), 500);
+            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return $this->json($response, $response['status']);
@@ -186,11 +186,11 @@ class StoreController extends BaseController
             $stores = array_map(function ($store) {
                 return $store->toApiArray();
             }, $stores);
-            $response = $this->getSuccessResponseScheme(['stores' => $stores, 'more' => $more]);
+            $response = $this->getResponseScheme(['stores' => $stores, 'more' => $more]);
         } catch (ValidationFailed $exception) {
-            $response = $this->getErrorResponseScheme($exception->errors, 400);
+            $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (\Throwable $exception) {
-            $response = $this->getErrorResponseScheme($exception->getMessage(), 500);
+            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return $this->json($response, $response['status']);
@@ -208,11 +208,11 @@ class StoreController extends BaseController
             $this->repository->delete($storeId);
             return new Response(null, 204);
         } catch (ValidationFailed $exception) {
-            $response = $this->getErrorResponseScheme($exception->errors, 400);
+            $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (NotFound $exception) {
-            $response = $this->getErrorResponseScheme($exception->getMessage(), 404);
+            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_NOT_FOUND);
         } catch (\Throwable $exception) {
-            $response = $this->getErrorResponseScheme($exception->getMessage(), 500);
+            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return $this->json($response);

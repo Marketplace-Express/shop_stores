@@ -1,6 +1,12 @@
 <?php
+/**
+ * User: Wajdi Jurry
+ * Date: ٢‏/٥‏/٢٠٢٠
+ * Time: ٢:٣٥ ص
+ */
 
 namespace App\Entity;
+
 
 use App\Entity\Interfaces\ApiArrayData;
 use Doctrine\ORM\Mapping as ORM;

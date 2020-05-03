@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * User: Wajdi Jurry
+ * Date: ٢‏/٥‏/٢٠٢٠
+ * Time: ٢:٣٥ ص
+ */
 
 namespace App\Controller;
 
@@ -7,6 +11,7 @@ namespace App\Controller;
 use App\Controller\Validator\InputConstraints;
 use App\Exception\ValidationFailed;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Validation;
 
 class BaseController extends AbstractController
@@ -33,20 +38,7 @@ class BaseController extends AbstractController
      * @param int $code
      * @return array
      */
-    public function getErrorResponseScheme($message, int $code): array
-    {
-        return [
-            'status' => $code,
-            'message' => $message
-        ];
-    }
-
-    /**
-     * @param $message
-     * @param int $code
-     * @return array
-     */
-    public function getSuccessResponseScheme($message, int $code = 200): array
+    public function getResponseScheme($message, int $code = Response::HTTP_OK): array
     {
         return [
             'status' => $code,

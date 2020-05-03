@@ -13,6 +13,7 @@ use Doctrine\Migrations\AbstractMigration;
 final class Version20200420223709 extends AbstractMigration
 {
     const TABLE_NAME = 'stores';
+    const REFERENCED_TABLE_LOCATIONS = 'locations';
 
     public function getDescription() : string
     {
@@ -45,6 +46,7 @@ final class Version20200420223709 extends AbstractMigration
         // Create unique index
         $table->addUniqueIndex(['store_id', 'owner_id'], 'unique_store_index');
         $table->addUniqueIndex(['location_id'], 'unique_location_index');
+        $table->addForeignKeyConstraint(self::REFERENCED_TABLE_LOCATIONS, ['location_id'], ['location_id']);
     }
 
     public function down(Schema $schema) : void

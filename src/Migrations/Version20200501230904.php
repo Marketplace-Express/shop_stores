@@ -13,6 +13,7 @@ use Doctrine\Migrations\AbstractMigration;
 final class Version20200501230904 extends AbstractMigration
 {
     const TABLE_NAME = 'followers';
+    const REFERENCE_TABLE_STORES = 'stores';
 
     public function getDescription() : string
     {
@@ -30,6 +31,8 @@ final class Version20200501230904 extends AbstractMigration
         $table->addColumn('followed_at', 'datetime')->setNotnull(true);
 
         $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['store_id', 'follower_id'], 'unique_follower_index');
+        $table->addForeignKeyConstraint(self::REFERENCE_TABLE_STORES, ['store_id'], ['store_id']);
     }
 
     public function down(Schema $schema) : void

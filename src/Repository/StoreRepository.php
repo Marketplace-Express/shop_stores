@@ -1,19 +1,21 @@
 <?php
+/**
+ * User: Wajdi Jurry
+ * Date: ٣‏/٥‏/٢٠٢٠
+ * Time: ١٢:٥١ ص
+ */
 
 namespace App\Repository;
+
 
 use App\Entity\Location;
 use App\Entity\Sort\SortStore;
 use App\Entity\Store;
 use App\Exception\DisabledEntity;
 use App\Exception\NotFound;
-use App\Logger\DbLogger;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\PersistentCollection;
 use Doctrine\Persistence\ManagerRegistry;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
-use Symfony\Bridge\Doctrine\Logger\DbalLogger;
-use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * @method Store|null find($id, $lockMode = null, $lockVersion = null)
@@ -21,20 +23,14 @@ use Symfony\Component\Stopwatch\Stopwatch;
  * @method Store[]    findAll()
  * @method Store[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class StoreRepository extends ServiceEntityRepository
+class StoreRepository extends BaseRepository
 {
-    /** @var \Doctrine\DBAL\Logging\DebugStack() */
-    private $logger;
-
+    /**
+     * StoreRepository constructor.
+     * @param ManagerRegistry $registry
+     */
     public function __construct(ManagerRegistry $registry)
     {
-        // Enable DQL debugging in dev environment
-        if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] == 'dev') {
-            $registry->getConnection()->getConfiguration()->setSQLLogger(
-                $this->logger = new DbalLogger(new Logger('queries', [new DbLogger()]), new Stopwatch())
-            );
-        }
-
         parent::__construct($registry, Store::class);
     }
 
@@ -217,6 +213,17 @@ class StoreRepository extends ServiceEntityRepository
             'stores' => $stores,
             'more' => $more
         ];
+    }
+
+    /**
+     * @param string $storeId
+     * @return Collection
+     * @throws DisabledEntity
+     * @throws NotFound
+     */
+    public function getFollowers(string $storeId): Collection
+    {
+        return $this->getById($storeId)->getFollowers();
     }
 
     // /**
