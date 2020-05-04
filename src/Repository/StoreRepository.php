@@ -201,15 +201,22 @@ class StoreRepository extends BaseRepository
         $this->getEntityManager()->getConfiguration()->setDefaultQueryHint('withDisabled', true);
 
         $more = false;
-        $stores = $this->findBy([], $sort->getSqlSort(), $limit+1, ($page - 1) * $limit);
 
-        if (count($stores) > $limit) {
-            array_pop($stores);
+        $query = $this->getEntityManager()->createQueryBuilder()
+            ->from('App:Store', 's')
+            ->select('s')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
+
+        $paginator = new Paginator($query);
+
+        if ($paginator->count() > $limit) {
             $more = true;
         }
 
         return [
-            'stores' => $stores,
+            'stores' => $paginator->getIterator()->getArrayCopy(),
+            'count' => $paginator->count(),
             'more' => $more
         ];
     }

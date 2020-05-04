@@ -181,12 +181,10 @@ class StoreController extends BaseController
         try {
             $this->validateRequest($data, new GetAllConstraint());
             $result = $this->repository->getAll($page, $limit, new SortStore($sort));
-            $stores = $result['stores'];
-            $more = $result['more'];
-            $stores = array_map(function ($store) {
+            $result['stores'] = array_map(function ($store) {
                 return $store->toApiArray();
-            }, $stores);
-            $response = $this->getResponseScheme(['stores' => $stores, 'more' => $more]);
+            }, $result['stores']);
+            $response = $this->getResponseScheme($result);
         } catch (ValidationFailed $exception) {
             $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (\Throwable $exception) {
