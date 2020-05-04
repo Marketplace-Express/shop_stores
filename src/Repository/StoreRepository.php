@@ -13,8 +13,7 @@ use App\Entity\Sort\SortStore;
 use App\Entity\Store;
 use App\Exception\DisabledEntity;
 use App\Exception\NotFound;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -213,17 +212,6 @@ class StoreRepository extends BaseRepository
             'stores' => $stores,
             'more' => $more
         ];
-    }
-
-    /**
-     * @param string $storeId
-     * @return Collection
-     * @throws DisabledEntity
-     * @throws NotFound
-     */
-    public function getFollowers(string $storeId): Collection
-    {
-        return $this->getById($storeId)->getFollowers();
     }
 
     // /**

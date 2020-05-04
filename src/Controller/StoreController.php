@@ -47,7 +47,7 @@ class StoreController extends BaseController
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      *
-     * @Route("/", name="Create", methods={"POST"})
+     * @Route("/", name="Create", methods={"POST"}, name="create")
      */
     public function create(Request $request)
     {
@@ -79,7 +79,7 @@ class StoreController extends BaseController
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response|void
      *
-     * @Route("/{storeId}/disable", methods={"PUT"})
+     * @Route("/{storeId}/disable", methods={"PUT"}, name="disable")
      */
     public function disable(string $storeId, Request $request)
     {
@@ -106,7 +106,7 @@ class StoreController extends BaseController
      * @param string $storeId
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      *
-     * @Route("/{storeId}", methods={"GET"})
+     * @Route("/{storeId}", methods={"GET"}, name="get_one")
      */
     public function getById(string $storeId)
     {
@@ -114,7 +114,7 @@ class StoreController extends BaseController
             $this->validateRequest(['storeId' => $storeId], new GetByIdConstraint());
             $response = $this->getResponseScheme($this->repository->getById($storeId)->toApiArray());
         } catch (ValidationFailed $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_BAD_REQUEST);
+            $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (NotFound $exception) {
             $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_NOT_FOUND);
         } catch (DisabledEntity $exception) {
@@ -130,7 +130,7 @@ class StoreController extends BaseController
      * @param string $storeId
      * @param Request $request
      *
-     * @Route("/{storeId}", methods={"PUT"})
+     * @Route("/{storeId}", methods={"PUT"}, name="update_one")
      */
     public function update(string $storeId, Request $request)
     {
@@ -164,7 +164,7 @@ class StoreController extends BaseController
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      *
-     * @Route("/", methods={"GET"})
+     * @Route("/", methods={"GET"}, name="get_all")
      */
     public function getAll(Request $request)
     {
@@ -197,7 +197,7 @@ class StoreController extends BaseController
     }
 
     /**
-     * @Route("/{storeId}", methods={"DELETE"})
+     * @Route("/{storeId}", methods={"DELETE"}, name="delete_one")
      * @param string $storeId
      * @return \Symfony\Component\HttpFoundation\Response|void
      */

@@ -1,8 +1,8 @@
 <?php
 /**
  * User: Wajdi Jurry
- * Date: ٢‏/٥‏/٢٠٢٠
- * Time: ٥:٣٧ م
+ * Date: ٤‏/٥‏/٢٠٢٠
+ * Time: ١:٢٨ ص
  */
 
 namespace App\Controller\Validator\Follow;
@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Uuid;
 use Symfony\Component\Validator\Context\ExecutionContext;
 
-class GetFollowersConstraint implements InputConstraints
+class GetFollowedStoresConstraint implements InputConstraints
 {
 
     /**
@@ -25,7 +25,7 @@ class GetFollowersConstraint implements InputConstraints
     public function getConstraints(): Collection
     {
         return new Collection([
-            'storeId' => [new NotBlank(), new Uuid()],
+            'followerId' => [new NotBlank(), new Uuid()],
             'page' => [new Callback(['callback' => [$this, "validatePageAndLimit"]]), new Range(['min' => 1])],
             'limit' => [new Callback(['callback' => [$this, "validatePageAndLimit"]]), new Range(['min' => 1, 'max' => 100])]
         ]);
