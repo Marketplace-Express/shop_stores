@@ -10,7 +10,7 @@ LABEL maintainer="Wajdi Jurry <github.com/wajdijurry>"
 RUN set -xe && apt-get -y update
 
 # Install required tools and dependencies
-RUN apt-get install -y wget libfreetype6-dev libpng-dev libjpeg-dev libcurl4-gnutls-dev libyaml-dev libicu-dev libzip-dev unzip git
+RUN apt-get install -y wget libfreetype6-dev libpng-dev libjpeg-dev libcurl4-gnutls-dev libyaml-dev libicu-dev libzip-dev uuid-dev unzip git
 
 # Install required PHP extensions
 RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd && \
@@ -20,7 +20,7 @@ RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd && \
 
 # Install extra extensions
 RUN docker-php-ext-install intl gettext gd bcmath zip pdo_mysql opcache && \
-    echo '' | pecl install redis mongodb xdebug
+    echo '' | pecl install redis mongodb uuid xdebug
 
 # Download Symfony CLI
 RUN wget https://get.symfony.com/cli/installer -O - | bash && \

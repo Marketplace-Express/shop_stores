@@ -11,7 +11,7 @@ namespace App\Repository;
 use App\Entity\Location;
 use App\Entity\Sort\SortStore;
 use App\Entity\Store;
-use App\Exception\DisabledEntity;
+use App\Exception\DisabledEntityException;
 use App\Exception\NotFound;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -83,7 +83,7 @@ class StoreRepository extends BaseRepository
      * @param bool $getDisabled
      * @return Store|null
      * @throws NotFound
-     * @throws DisabledEntity
+     * @throws DisabledEntityException
      */
     public function getById(string $storeId, bool $getDisabled = false): ?Store
     {
@@ -107,7 +107,7 @@ class StoreRepository extends BaseRepository
      * @throws NotFound
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws DisabledEntity
+     * @throws DisabledEntityException
      */
     public function disable(string $storeId, int $disableReason, ?string $disableComment = null)
     {
@@ -125,7 +125,7 @@ class StoreRepository extends BaseRepository
      * @throws NotFound
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws DisabledEntity
+     * @throws DisabledEntityException
      */
     public function delete(string $storeId)
     {
@@ -145,7 +145,7 @@ class StoreRepository extends BaseRepository
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
-     * @throws DisabledEntity
+     * @throws DisabledEntityException
      */
     public function update(
         string $storeId,

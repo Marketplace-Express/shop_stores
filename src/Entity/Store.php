@@ -136,6 +136,12 @@ class Store implements ApiArrayData, DisableInterface
     private $followers;
 
     /**
+     * @var string
+     * @ORM\Column(type="string", length=36)
+     */
+    private $deletionToken = 'N/A';
+
+    /**
      * Store constructor.
      */
     public function __construct()
@@ -303,6 +309,14 @@ class Store implements ApiArrayData, DisableInterface
     public function setDisableComment(string $disableComment): void
     {
         $this->disableComment = $disableComment;
+    }
+
+    /**
+     * @param string $deletionToken
+     */
+    public function setDeletionToken(string $deletionToken): void
+    {
+        $this->deletionToken = $deletionToken;
     }
 
     private function locationToApiArray(): array

@@ -10,7 +10,7 @@ namespace App\Exception;
 
 use Throwable;
 
-class DisabledEntity extends \Exception
+class DisabledEntityException extends \Exception
 {
     public function __construct($message = "Disabled entity", $code = 422, Throwable $previous = null)
     {

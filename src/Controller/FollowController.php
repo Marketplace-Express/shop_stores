@@ -12,7 +12,7 @@ use App\Controller\Validator\Follow\GetFollowedStoresConstraint;
 use App\Controller\Validator\Follow\GetFollowersConstraint;
 use App\Controller\Validator\Follow\UnFollowConstraint;
 use App\Entity\Interfaces\ApiArrayData;
-use App\Exception\DisabledEntity;
+use App\Exception\DisabledEntityException;
 use App\Exception\NotFound;
 use App\Exception\ValidationFailed;
 use App\Repository\FollowerRepository;
@@ -67,7 +67,7 @@ class FollowController extends BaseController
             $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (NotFound $exception) {
             $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_NOT_FOUND);
-        } catch (DisabledEntity $exception) {
+        } catch (DisabledEntityException $exception) {
             $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (UniqueConstraintViolationException $exception) {
             $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_BAD_REQUEST);

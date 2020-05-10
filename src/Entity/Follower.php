@@ -12,12 +12,13 @@ use Gedmo\Mapping\Annotation as Gedmo;
  */
 class Follower implements ApiArrayData
 {
+
     /**
      * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="UUID")
+     * @ORM\Column(type="string", length=36)
      */
-    private $id;
+    private $followerId;
 
     /**
      * @var Store
@@ -28,20 +29,10 @@ class Follower implements ApiArrayData
     private $store;
 
     /**
-     * @ORM\Column(type="string", length=36)
-     */
-    private $followerId;
-
-    /**
      * @ORM\Column(type="datetime")
      * @Gedmo\Timestampable(on="create")
      */
     private $followedAt;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getStore(): ?Store
     {

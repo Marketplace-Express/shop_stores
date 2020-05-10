@@ -25,13 +25,17 @@ final class Version20200501230904 extends AbstractMigration
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
         $table = $schema->createTable(self::TABLE_NAME);
-        $table->addColumn('id', 'bigint')->setAutoincrement(true);
-        $table->addColumn('store_id', 'string')->setNotnull(true)->setLength(36);
         $table->addColumn('follower_id', 'string')->setNotnull(true)->setLength(36);
+        $table->addColumn('store_id', 'string')->setNotnull(true)->setLength(36);
         $table->addColumn('followed_at', 'datetime')->setNotnull(true);
 
-        $table->setPrimaryKey(['id']);
+        // Set primary key
+        $table->setPrimaryKey(['follower_id']);
+
+        // Create unique index
         $table->addUniqueIndex(['store_id', 'follower_id'], 'unique_follower_index');
+
+        // Add foreign key constraint
         $table->addForeignKeyConstraint(self::REFERENCE_TABLE_STORES, ['store_id'], ['store_id']);
     }
 

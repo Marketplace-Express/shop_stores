@@ -9,7 +9,7 @@ namespace App\Entity\Filter\Disable;
 
 
 use App\Entity\Interfaces\DisableInterface;
-use App\Exception\DisabledEntity;
+use App\Exception\DisabledEntityException;
 use Doctrine\Common\EventArgs;
 use Doctrine\Common\EventSubscriber;
 
@@ -38,7 +38,7 @@ class DisableEventSubscriber implements EventSubscriber
 
     /**
      * @param EventArgs $args
-     * @throws DisabledEntity
+     * @throws DisabledEntityException
      */
     public function postLoad(EventArgs $args)
     {
@@ -50,7 +50,7 @@ class DisableEventSubscriber implements EventSubscriber
         }
 
         if (!$eventManager->getConfiguration()->getDefaultQueryHint('withDisabled') && $entity->getDisabledAt()) {
-            throw new DisabledEntity();
+            throw new DisabledEntityException();
         }
     }
 }

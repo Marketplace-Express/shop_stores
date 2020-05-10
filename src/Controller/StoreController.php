@@ -15,10 +15,11 @@ use App\Controller\Validator\Store\GetAllConstraint;
 use App\Controller\Validator\Store\GetByIdConstraint;
 use App\Controller\Validator\Store\UpdateConstraint;
 use App\Entity\Sort\SortStore;
-use App\Exception\DisabledEntity;
+use App\Exception\DisabledEntityException;
 use App\Exception\NotFound;
 use App\Exception\ValidationFailed;
-use App\Repository\StoreRepository;
+use App\Services\StoreService;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,8 +32,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class StoreController extends BaseController
 {
-    /** @var StoreRepository */
-    private $repository;
+    /** @var StoreService */
+    private $service;
 
     /**
      * StoreController constructor.
@@ -40,7 +41,7 @@ class StoreController extends BaseController
      */
     public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->repository = $entityManager->getRepository('App:Store');
+        $this->service = new StoreService($entityManager);
     }
 
     /**
@@ -55,7 +56,7 @@ class StoreController extends BaseController
 
         try {
             $this->validateRequest($data, new CreateConstraints());
-            $store = $this->repository->create(
+            $response = $this->getResponseScheme($this->service->create(
                 $data['ownerId'],
                 $data['name'],
                 $data['description'],
@@ -63,10 +64,11 @@ class StoreController extends BaseController
                 $data['photo'],
                 $data['coverPhoto'],
                 $data['location']
-            );
-            $response = $this->getResponseScheme($store->toApiArray());
+            ));
         } catch (ValidationFailed $exception) {
             $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
+        } catch (UniqueConstraintViolationException $exception) {
+            $response = $this->getResponseScheme('Duplicate entry', Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (\Throwable $exception) {
             $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -87,13 +89,13 @@ class StoreController extends BaseController
 
         try {
             $this->validateRequest(array_merge($data, ['storeId' => $storeId]), new DisableConstraint());
-            $this->repository->disable($storeId, $data['disableReason'], $data['disableComment']);
+            $this->service->disable($storeId, $data['disableReason'], $data['disableComment']);
             return new Response(null, 204);
         } catch (ValidationFailed $exception) {
             $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (NotFound $exception) {
             $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_NOT_FOUND);
-        } catch (DisabledEntity $exception) {
+        } catch (DisabledEntityException $exception) {
             $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (\Throwable $exception) {
             $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -112,12 +114,12 @@ class StoreController extends BaseController
     {
         try {
             $this->validateRequest(['storeId' => $storeId], new GetByIdConstraint());
-            $response = $this->getResponseScheme($this->repository->getById($storeId)->toApiArray());
+            $response = $this->getResponseScheme($this->service->getById($storeId));
         } catch (ValidationFailed $exception) {
             $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (NotFound $exception) {
             $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_NOT_FOUND);
-        } catch (DisabledEntity $exception) {
+        } catch (DisabledEntityException $exception) {
             $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (\Throwable $exception) {
             $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -138,20 +140,19 @@ class StoreController extends BaseController
 
         try {
             $this->validateRequest($data, new UpdateConstraint());
-            $store = $this->repository->update(
+            $response = $this->getResponseScheme($this->service->update(
                 $storeId,
                 $data['name'],
                 $data['description'],
                 $data['location'],
                 $data['photo'],
                 $data['coverPhoto']
-            );
-            $response = $this->getResponseScheme($store->toApiArray());
+            ));
         } catch (ValidationFailed $exception) {
             $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (NotFound $exception) {
             $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_NOT_FOUND);
-        } catch (DisabledEntity $exception) {
+        } catch (DisabledEntityException $exception) {
             $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (\Throwable $exception) {
             $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -180,11 +181,7 @@ class StoreController extends BaseController
 
         try {
             $this->validateRequest($data, new GetAllConstraint());
-            $result = $this->repository->getAll($page, $limit, new SortStore($sort));
-            $result['stores'] = array_map(function ($store) {
-                return $store->toApiArray();
-            }, $result['stores']);
-            $response = $this->getResponseScheme($result);
+            $response = $this->getResponseScheme($this->service->getAll($page, $limit, new SortStore($sort)));
         } catch (ValidationFailed $exception) {
             $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (\Throwable $exception) {
@@ -203,7 +200,7 @@ class StoreController extends BaseController
     {
         try {
             $this->validateRequest(['storeId' => $storeId], new DeleteConstraint());
-            $this->repository->delete($storeId);
+            $this->service->delete($storeId);
             return new Response(null, 204);
         } catch (ValidationFailed $exception) {
             $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
