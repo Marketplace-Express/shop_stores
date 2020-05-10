@@ -11,15 +11,14 @@ use App\Controller\Validator\Follow\FollowConstraint;
 use App\Controller\Validator\Follow\GetFollowedStoresConstraint;
 use App\Controller\Validator\Follow\GetFollowersConstraint;
 use App\Controller\Validator\Follow\UnFollowConstraint;
-use App\Entity\Interfaces\ApiArrayData;
 use App\Exception\DisabledEntityException;
 use App\Exception\NotFound;
 use App\Exception\ValidationFailed;
 use App\Repository\FollowerRepository;
 use App\Repository\StoreRepository;
+use App\Services\FollowService;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -32,11 +31,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class FollowController extends BaseController
 {
-    /** @var FollowerRepository */
-    private $followerRepository;
-
-    /** @var StoreRepository */
-    private $storeRepository;
+    /** @var FollowService */
+    private $service;
 
     /**
      * FollowerController constructor.
@@ -44,8 +40,10 @@ class FollowController extends BaseController
      */
     public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->storeRepository = $entityManager->getRepository('App:Store');
-        $this->followerRepository = $entityManager->getRepository('App:Follower');
+        $this->service = new FollowService(
+            $entityManager->getRepository('App:Follower'),
+            $entityManager->getRepository('App:Store')
+        );
     }
 
     /**
@@ -60,8 +58,7 @@ class FollowController extends BaseController
 
         try {
             $this->validateRequest($data, new FollowConstraint());
-            $store = $this->storeRepository->getById($data['storeId']);
-            $this->followerRepository->follow($store, $data['followerId']);
+            $this->service->follow($data['storeId'], $data['followerId']);
             return new Response(null, Response::HTTP_NO_CONTENT);
         } catch (ValidationFailed $exception) {
             $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
@@ -95,11 +92,7 @@ class FollowController extends BaseController
 
         try {
             $this->validateRequest($data, new GetFollowersConstraint());
-
-            $followers = $this->followerRepository->getFollowers($storeId, $data['limit'], $data['page']);
-            $followers['followers'] = array_map(function ($follower) {
-                return $follower->getFollowerId();
-            }, $followers['followers']);
+            $followers = $this->service->getFollowers($data['storeId'], $data['limit'], $data['page']);
             $response = $this->getResponseScheme($followers);
         } catch (ValidationFailed $exception) {
             $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
@@ -126,13 +119,7 @@ class FollowController extends BaseController
 
         try {
             $this->validateRequest($data, new GetFollowedStoresConstraint());
-
-            $followedStores = $this->followerRepository->followedStores($data['followerId'], $data['limit'], $data['page']);
-
-            $followedStores['stores'] = array_map(function ($store) {
-                return $store->getStore()->toApiArray();
-            }, $followedStores['stores']);
-
+            $followedStores = $this->service->getFollowedStores($data['followerId'], $data['limit'], $data['page']);
             $response = $this->getResponseScheme($followedStores);
         } catch (ValidationFailed $exception) {
             $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
@@ -155,8 +142,7 @@ class FollowController extends BaseController
 
         try {
             $this->validateRequest($data, new UnFollowConstraint());
-            $this->followerRepository->unFollow($data['storeId'], $data['followerId']);
-
+            $this->service->unfollow($data['storeId'], $data['followerId']);
             return new Response(null, Response::HTTP_NO_CONTENT);
         } catch (ValidationFailed $exception) {
             $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
