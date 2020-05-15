@@ -79,13 +79,20 @@ class StoreService
 
     /**
      * @param string $storeId
+     * @param bool $withCategories
      * @return array
      * @throws \App\Exception\DisabledEntityException
      * @throws \App\Exception\NotFound
      */
-    public function getById(string $storeId): array
+    public function getById(string $storeId, bool $withCategories = false): array
     {
-        return $this->repository->getById($storeId)->toApiArray();
+        $store = $this->repository->getById($storeId)->toApiArray();
+
+        if ($withCategories) {
+            // TODO: get categories
+        }
+
+        return $store;
     }
 
     /**

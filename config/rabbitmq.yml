@@ -1,0 +1,39 @@
+old_sound_rabbit_mq:
+    connections:
+        default:
+            host: '%env(RABBIT_MQ_HOST)%'
+            user: '%env(resolve:RABBIT_MQ_USERNAME)%'
+            password: '%env(resolve:RABBIT_MQ_PASSWORD)%'
+            vhost: '/'
+            lazy:     false
+            connection_timeout: 10
+            read_write_timeout: 3
+
+            # requires php-amqplib v2.4.1+ and PHP5.4+
+            keepalive: false
+
+            #requires php_sockets.dll
+            use_socket: false # default false
+    producers:
+        emailing:
+            connection: default
+            exchange_options:
+                name: emails
+                type: direct
+    consumers:
+        sync:
+            connection: default
+            exchange_options: {name: 'stores_exchange', type: direct}
+            queue_options:
+                    name: 'stores_sync'
+                    routing_keys:
+                        - 'sync'
+            callback: consumer_service
+        async:
+            connection: default
+            exchange_options: {name: 'stores_exchange', type: direct}
+            queue_options:
+                    name: 'stores_async'
+                    routing_keys:
+                        - 'async'
+            callback: consumer_service

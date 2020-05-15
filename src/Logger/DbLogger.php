@@ -8,31 +8,45 @@
 namespace App\Logger;
 
 
-use Doctrine\DBAL\Logging\SQLLogger;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
-use Symfony\Component\HttpFoundation\File\File;
 
 class DbLogger extends AbstractProcessingHandler
 {
-    const LOG_NAME = 'db.log';
+    const MIN_THRESHOLD_PROD_MS = 100;
 
     /**
      * @var array
      */
     private $data = [];
 
+    /** @var resource */
     private $stream;
 
-    public function __construct($level = Logger::DEBUG, bool $bubble = true)
+    /** @var string */
+    private $env;
+
+    /**
+     * DbLogger constructor.
+     * @param string $env
+     * @param int $level
+     * @param bool $bubble
+     */
+    public function __construct(string $env = 'dev', $level = Logger::DEBUG, bool $bubble = true)
     {
+        // TODO: get project root directory
         $this->stream = fopen($_SERVER['LOG_DIRECTORY'] . 'db.log', 'a');
+        $this->env = $env;
+
         parent::__construct($level, $bubble);
     }
 
+    /**
+     * @return float|mixed|string
+     */
     private function getQueryExecutionTime()
     {
-        return $this->data['executionTime(ms)'] = microtime(true) - $this->data['start'];
+        return microtime(true) - $this->data['start'];
     }
 
     /**
@@ -40,6 +54,15 @@ class DbLogger extends AbstractProcessingHandler
      */
     protected function write(array $record): void
     {
+        if ($this->env == 'prod') {
+            $queryTime = $this->getQueryExecutionTime();
+
+            // Do not log if query time is less than minimum threshold in microseconds
+            if ($queryTime < self::MIN_THRESHOLD_PROD_MS * 1000) {
+                return;
+            }
+        }
+
         if (!is_resource($this->stream)) {
             $this->stream = null;
 

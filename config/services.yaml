@@ -3,6 +3,8 @@
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+imports:
+    - { resource: rabbitmq.yml }
 parameters:
 
 services:
@@ -46,6 +48,21 @@ services:
         class: App\Entity\Filter\Disable\DisableEventSubscriber
         tags:
             - { name: doctrine.event_subscriber, connection: default }
+
+    consumer_service:
+        class: App\Services\ConsumerService
+
+    app.store_service:
+        class: App\Services\StoreService
+        arguments: ['@doctrine.orm.entity_manager']
+        public: true
+        lazy: true
+
+    app.follow_service:
+        class: App\Services\FollowService
+        arguments: ['@doctrine.orm.entity_manager']
+        public: true
+        lazy: true
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

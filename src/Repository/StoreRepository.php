@@ -13,6 +13,8 @@ use App\Entity\Sort\SortStore;
 use App\Entity\Store;
 use App\Exception\DisabledEntityException;
 use App\Exception\NotFound;
+use App\Repository\Traits\SqlLoggingTrait;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -22,15 +24,19 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Store[]    findAll()
  * @method Store[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class StoreRepository extends BaseRepository
+class StoreRepository extends ServiceEntityRepository
 {
+
+    use SqlLoggingTrait;
+
     /**
      * StoreRepository constructor.
      * @param ManagerRegistry $registry
      */
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Store::class);
+        $this->enableLogging($registry);
+        parent::__construct($registry, 'App:Store');
     }
 
     /**

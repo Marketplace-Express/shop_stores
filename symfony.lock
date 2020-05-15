@@ -81,6 +81,9 @@
     "egulias/email-validator": {
         "version": "2.1.17"
     },
+    "emag-tech-labs/rabbitmq-bundle": {
+        "version": "2.1.1"
+    },
     "gedmo/doctrine-extensions": {
         "version": "v2.4.39"
     },
@@ -101,6 +104,9 @@
     },
     "php": {
         "version": "7.3"
+    },
+    "php-amqplib/php-amqplib": {
+        "version": "v2.8.0"
     },
     "phpdocumentor/reflection-common": {
         "version": "2.0.0"

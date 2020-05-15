@@ -20,7 +20,6 @@ use App\Exception\NotFound;
 use App\Exception\ValidationFailed;
 use App\Services\StoreService;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -37,11 +36,11 @@ class StoreController extends BaseController
 
     /**
      * StoreController constructor.
-     * @param EntityManagerInterface $entityManager
+     * @param StoreService $service
      */
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(StoreService $service)
     {
-        $this->service = new StoreService($entityManager);
+        $this->service = $service;
     }
 
     /**

@@ -10,6 +10,7 @@ namespace App\Services;
 
 use App\Repository\FollowerRepository;
 use App\Repository\StoreRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 class FollowService
 {
@@ -21,13 +22,12 @@ class FollowService
 
     /**
      * FollowService constructor.
-     * @param FollowerRepository $followerRepository
-     * @param StoreRepository $storeRepository
+     * @param EntityManagerInterface $entityManager
      */
-    public function __construct(FollowerRepository $followerRepository, StoreRepository $storeRepository)
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->followerRepository = $followerRepository;
-        $this->storeRepository = $storeRepository;
+        $this->followerRepository = $entityManager->getRepository('App:Follower');
+        $this->storeRepository = $entityManager->getRepository('App:Store');
     }
 
     /**
@@ -86,7 +86,7 @@ class FollowService
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function unfollow(string $storeId, string $followerId): void
+    public function unFollow(string $storeId, string $followerId): void
     {
         $this->followerRepository->unFollow($storeId, $followerId);
     }

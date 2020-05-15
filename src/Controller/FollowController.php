@@ -14,11 +14,8 @@ use App\Controller\Validator\Follow\UnFollowConstraint;
 use App\Exception\DisabledEntityException;
 use App\Exception\NotFound;
 use App\Exception\ValidationFailed;
-use App\Repository\FollowerRepository;
-use App\Repository\StoreRepository;
 use App\Services\FollowService;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -36,14 +33,11 @@ class FollowController extends BaseController
 
     /**
      * FollowerController constructor.
-     * @param EntityManagerInterface $entityManager
+     * @param FollowService $service
      */
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(FollowService $service)
     {
-        $this->service = new FollowService(
-            $entityManager->getRepository('App:Follower'),
-            $entityManager->getRepository('App:Store')
-        );
+        $this->service = $service;
     }
 
     /**
@@ -142,7 +136,7 @@ class FollowController extends BaseController
 
         try {
             $this->validateRequest($data, new UnFollowConstraint());
-            $this->service->unfollow($data['storeId'], $data['followerId']);
+            $this->service->unFollow($data['storeId'], $data['followerId']);
             return new Response(null, Response::HTTP_NO_CONTENT);
         } catch (ValidationFailed $exception) {
             $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);

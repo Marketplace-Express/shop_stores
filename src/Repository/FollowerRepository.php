@@ -4,8 +4,8 @@ namespace App\Repository;
 
 use App\Entity\Follower;
 use App\Entity\Store;
+use App\Repository\Traits\SqlLoggingTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -18,13 +18,17 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class FollowerRepository extends ServiceEntityRepository
 {
+
+    use SqlLoggingTrait;
+
     /**
      * FollowerRepository constructor.
      * @param ManagerRegistry $registry
      */
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Follower::class);
+        $this->enableLogging($registry);
+        parent::__construct($registry, 'App:Follower');
     }
 
     /**
