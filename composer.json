@@ -1,12 +1,13 @@
 {
   "require": {
     "php": "^7.2.5",
+    "ext-amqp": "*",
     "ext-ctype": "*",
     "ext-iconv": "*",
     "ext-json": "*",
     "doctrine/doctrine-migrations-bundle": "^2.1",
-    "emag-tech-labs/rabbitmq-bundle": "^2.1",
     "gedmo/doctrine-extensions": "^2.4",
+    "php-amqplib/php-amqplib": "^2.11",
     "sensio/framework-extra-bundle": "^5.5",
     "symfony/console": "5.0.*",
     "symfony/dependency-injection": "5.0.*",
@@ -41,7 +42,8 @@
   },
   "autoload": {
     "psr-4": {
-      "App\\": "src/"
+      "App\\": "src/",
+      "Jurry\\": "bundles/Jurry/"
     }
   },
   "autoload-dev": {

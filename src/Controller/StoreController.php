@@ -113,7 +113,7 @@ class StoreController extends BaseController
     {
         try {
             $this->validateRequest(['storeId' => $storeId], new GetByIdConstraint());
-            $response = $this->getResponseScheme($this->service->getById($storeId));
+            $response = $this->getResponseScheme($this->service->getById($storeId, true));
         } catch (ValidationFailed $exception) {
             $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (NotFound $exception) {

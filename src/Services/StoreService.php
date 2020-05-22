@@ -11,6 +11,7 @@ namespace App\Services;
 use App\Entity\Sort\SortStore;
 use App\Repository\StoreRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Jurry\RabbitMQ\AmqpHandler;
 
 class StoreService
 {
@@ -18,12 +19,18 @@ class StoreService
     private $repository;
 
     /**
+     * @var AmqpHandler
+     */
+    private $amqpHandler;
+
+    /**
      * StoreService constructor.
      * @param EntityManagerInterface $entityManager
      */
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, AmqpHandler $amqpHandler)
     {
         $this->repository = $entityManager->getRepository('App:Store');
+        $this->amqpHandler = $amqpHandler;
     }
 
     /**
@@ -89,7 +96,7 @@ class StoreService
         $store = $this->repository->getById($storeId)->toApiArray();
 
         if ($withCategories) {
-            // TODO: get categories
+
         }
 
         return $store;
