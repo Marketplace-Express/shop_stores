@@ -11,26 +11,25 @@ namespace App\Services;
 use App\Entity\Sort\SortStore;
 use App\Repository\StoreRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Jurry\RabbitMQ\AmqpHandler;
+use Jurry\RabbitMQ\Handler\RequestSender;
 
 class StoreService
 {
     /** @var StoreRepository */
     private $repository;
 
-    /**
-     * @var AmqpHandler
-     */
-    private $amqpHandler;
+    /** @var RequestSender */
+    private $requestSender;
 
     /**
      * StoreService constructor.
      * @param EntityManagerInterface $entityManager
+     * @param RequestSender $requestSender
      */
-    public function __construct(EntityManagerInterface $entityManager, AmqpHandler $amqpHandler)
+    public function __construct(EntityManagerInterface $entityManager, RequestSender $requestSender)
     {
         $this->repository = $entityManager->getRepository('App:Store');
-        $this->amqpHandler = $amqpHandler;
+        $this->requestSender = $requestSender;
     }
 
     /**
@@ -96,7 +95,15 @@ class StoreService
         $store = $this->repository->getById($storeId)->toApiArray();
 
         if ($withCategories) {
+            $categories = $this->requestSender
+                ->setQueueName('categories_sync')
+                ->setService('appServices')
+                ->setServiceArgs(['categoryService'])
+                ->setMethod('getByVendorId')
+                ->setData([$storeId])
+                ->sendSync();
 
+            $store['categories'] = $categories;
         }
 
         return $store;

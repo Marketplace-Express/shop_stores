@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f25b527f62e9919b61f397c518c62796",
+    "content-hash": "3b359ef697fbd1936d6cb93d50edd94c",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -1453,6 +1453,52 @@
                 "sql"
             ],
             "time": "2014-01-12T16:20:24+00:00"
+        },
+        {
+            "name": "jurry/amqp-symfony-bundle",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://gitlab.com/shop-dependencies/amqp-symfony-bundle.git",
+                "reference": "03c3d099e8f079ed65152983de97ec7a5e942e4e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://gitlab.com/api/v4/projects/shop-dependencies%2Famqp-symfony-bundle/repository/archive.zip?sha=03c3d099e8f079ed65152983de97ec7a5e942e4e",
+                "reference": "03c3d099e8f079ed65152983de97ec7a5e942e4e",
+                "shasum": ""
+            },
+            "require": {
+                "ext-sockets": "*",
+                "php-amqplib/php-amqplib": "^2.11",
+                "symfony/config": "*",
+                "symfony/console": "*",
+                "symfony/http-kernel": "*",
+                "symfony/validator": "*"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "symfony": {
+                    "require": "5.*"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Jurry\\RabbitMQ\\": "Jurry/RabbitMQ/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Wajdi Jurry",
+                    "email": "jurrywajdi@yahoo.com"
+                }
+            ],
+            "description": "RabbitMQ Symfony Bundle",
+            "time": "2020-05-24T15:36:56+00:00"
         },
         {
             "name": "monolog/monolog",

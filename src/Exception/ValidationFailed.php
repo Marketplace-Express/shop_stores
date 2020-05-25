@@ -1,10 +1,12 @@
 <?php
-
+/**
+ * User: Wajdi Jurry
+ * Date: 17 Apr 2020
+ * Time: 02:06 PM
+ */
 
 namespace App\Exception;
 
-
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class ValidationFailed extends \Exception
 {
