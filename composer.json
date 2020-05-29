@@ -1,14 +1,13 @@
 {
   "require": {
     "php": "^7.2.5",
-    "ext-amqp": "*",
     "ext-ctype": "*",
     "ext-iconv": "*",
     "ext-json": "*",
+    "ext-sockets": "*",
     "doctrine/doctrine-migrations-bundle": "^2.1",
     "gedmo/doctrine-extensions": "^2.4",
     "jurry/amqp-symfony-bundle": "^1.0",
-    "php-amqplib/php-amqplib": "^2.11",
     "sensio/framework-extra-bundle": "^5.5",
     "symfony/console": "5.0.*",
     "symfony/dependency-injection": "5.0.*",
@@ -64,7 +63,7 @@
   },
   "extra": {
     "symfony": {
-      "allow-contrib": true,
+      "allow-contrib": "true",
       "require": "5.0.*"
     }
   }
