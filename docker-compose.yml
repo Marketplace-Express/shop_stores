@@ -14,12 +14,18 @@ services:
   stores-sync:
     image: 'registry.gitlab.com/shop_ecommerce/shop_stores'
     command: php bin/console sync_worker
+    volumes:
+      - .:/src
+      - /src/vendor
     environment:
       - PHP_IDE_CONFIG=serverName=docker
 
   stores-async:
     image: 'registry.gitlab.com/shop_ecommerce/shop_stores'
     command: php bin/console async_worker
+    volumes:
+      - .:/src
+      - /src/vendor
     environment:
       - PHP_IDE_CONFIG=serverName=docker
 
