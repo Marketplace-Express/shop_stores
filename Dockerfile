@@ -6,6 +6,7 @@ FROM php:7.3-fpm
 
 LABEL maintainer="Wajdi Jurry <github.com/wajdijurry>"
 
+# Important! To prevent this warning "debconf: unable to initialize frontend"
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Update apt repos
