@@ -21,15 +21,18 @@ class StoreService
     /** @var RequestSender */
     private $requestSender;
 
+    /** @var ServiceFactory */
+    private $factory;
+
     /**
      * StoreService constructor.
      * @param EntityManagerInterface $entityManager
-     * @param RequestSender $requestSender
+     * @param ServiceFactory $factory
      */
-    public function __construct(EntityManagerInterface $entityManager, RequestSender $requestSender)
+    public function __construct(EntityManagerInterface $entityManager, ServiceFactory  $factory)
     {
         $this->repository = $entityManager->getRepository('App:Store');
-        $this->requestSender = $requestSender;
+        $this->factory = $factory;
     }
 
     /**
@@ -89,21 +92,19 @@ class StoreService
      * @return array
      * @throws \App\Exception\DisabledEntityException
      * @throws \App\Exception\NotFound
+     * @throws \App\Exception\ServiceNotFoundException
+     * @throws \App\Exception\UnableToInvokeException
      */
     public function getById(string $storeId, bool $withCategories = false): array
     {
         $store = $this->repository->getById($storeId)->toApiArray();
 
         if ($withCategories) {
-            $categories = $this->requestSender
-                ->setQueueName('categories_sync')
-                ->setService('appServices')
-                ->setServiceArgs(['categoryService'])
-                ->setMethod('getByVendorId')
-                ->setData([$storeId])
-                ->sendSync();
-
-            $store['categories'] = $categories;
+            $dataGrabber = $this->factory
+                ->setServiceName('data_grabber')
+                ->setMethod('fetch')
+                ->createService();
+            $store['categories'] = $dataGrabber('categories_sync', 'categoryService', 'getByStoreId', $storeId);
         }
 
         return $store;

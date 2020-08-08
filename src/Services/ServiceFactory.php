@@ -20,6 +20,7 @@ class ServiceFactory
     /** @var string */
     private $method;
 
+    /** @var ContainerInterface */
     private $container;
 
     /**

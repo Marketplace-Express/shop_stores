@@ -61,5 +61,10 @@ services:
         public: true
         lazy: true
 
+    app.data_grabber_service:
+        class: App\Services\DataGrabberService
+        public: true
+        lazy: true
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

@@ -9,15 +9,13 @@ namespace App\Services;
 
 
 use App\Exception\ValidationFailed;
-use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Validator\Validation;
 
-class ConsumerService implements ConsumerInterface
+class ConsumerService
 {
     /** @var ServiceFactory */
-    private $serviceFactory;
+    private $factory;
 
     private $logger;
 
@@ -29,7 +27,7 @@ class ConsumerService implements ConsumerInterface
      */
     public function __construct(ServiceFactory $factory, LoggerInterface $logger)
     {
-        $this->serviceFactory = $factory;
+        $this->factory = $factory;
         $this->logger = $logger;
     }
 
@@ -41,7 +39,7 @@ class ConsumerService implements ConsumerInterface
      */
     private function getCallableService(object $message)
     {
-        return $this->serviceFactory
+        return $this->factory
             ->setServiceName($message->service)
             ->setMethod($message->method)
             ->createService();
