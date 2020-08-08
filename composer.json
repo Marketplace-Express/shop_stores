@@ -32,7 +32,9 @@
     "symfony/yaml": "5.0.*"
   },
   "require-dev": {
-      "symfony/maker-bundle": "^1.15"
+      "symfony/maker-bundle": "^1.15",
+      "phpunit/phpunit": "^7.3",
+      "symfony/phpunit-bridge": "*"
   },
   "config": {
     "preferred-install": {

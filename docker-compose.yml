@@ -29,6 +29,13 @@ services:
     environment:
       - PHP_IDE_CONFIG=serverName=docker
 
+  stores-unit-test:
+    image: 'registry.gitlab.com/shop_ecommerce/shop_stores'
+    command: php vendor/symfony/phpunit-bridge/bin/simple-phpunit
+    volumes:
+      - .:/src
+      - /src/vendor
+
 networks:
   default:
     external:
