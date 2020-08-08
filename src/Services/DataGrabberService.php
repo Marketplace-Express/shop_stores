@@ -1,7 +1,7 @@
 <?php
 /**
  * User: Wajdi Jurry
- * Date: ٨‏/٨‏/٢٠٢٠
+ * Date: 08/08/2020
  * Time: ١٢:٢٦ م
  */
 
