@@ -9,16 +9,12 @@ namespace App\Services;
 
 
 use App\Exception\ServiceNotFoundException;
-use App\Exception\UnableToInvokeException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ServiceFactory
 {
     /** @var string */
     private $serviceName;
-
-    /** @var string */
-    private $method;
 
     /** @var ContainerInterface */
     private $container;
@@ -49,23 +45,11 @@ class ServiceFactory
     }
 
     /**
-     * @param mixed $method
-     * @return ServiceFactory
-     */
-    public function setMethod($method): self
-    {
-        $this->method = $method;
-
-        return $this;
-    }
-
-    /**
      * @return mixed
      *
      * @throws ServiceNotFoundException
-     * @throws UnableToInvokeException
      */
-    public function createService(): array
+    public function createService()
     {
         $serviceName = $this->getServiceName();
 
@@ -73,12 +57,6 @@ class ServiceFactory
             throw new ServiceNotFoundException($serviceName);
         }
 
-        $service = $this->container->get($serviceName);
-
-        if (!is_callable([$service, $this->method])) {
-            throw new UnableToInvokeException();
-        }
-
-        return [$service, $this->method];
+        return $this->container->get($serviceName);
     }
 }

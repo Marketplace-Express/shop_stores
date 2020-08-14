@@ -8,6 +8,7 @@
 namespace App\Services;
 
 
+use App\Exception\UnableToInvokeException;
 use App\Exception\ValidationFailed;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
@@ -35,13 +36,11 @@ class ConsumerService
      * @param object $message
      * @return mixed
      * @throws \App\Exception\ServiceNotFoundException
-     * @throws \App\Exception\UnableToInvokeException
      */
     private function getCallableService(object $message)
     {
         return $this->factory
             ->setServiceName($message->service)
-            ->setMethod($message->method)
             ->createService();
     }
 
@@ -70,8 +69,14 @@ class ConsumerService
 
         try {
             $this->validateMessage($message);
+
             $callableService = $this->getCallableService($message);
-            $callableService(...$message->params);
+
+            if (!is_callable([$callableService, $message->method])) {
+                throw new UnableToInvokeException();
+            }
+
+            call_user_func_array([$callableService, $message->method], $message->params);
         } catch (\Throwable $exception) {
             $this->logError($exception);
         }

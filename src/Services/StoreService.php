@@ -11,15 +11,11 @@ namespace App\Services;
 use App\Entity\Sort\SortStore;
 use App\Repository\StoreRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Jurry\RabbitMQ\Handler\RequestSender;
 
 class StoreService
 {
     /** @var StoreRepository */
     private $repository;
-
-    /** @var RequestSender */
-    private $requestSender;
 
     /** @var ServiceFactory */
     private $factory;
@@ -93,7 +89,6 @@ class StoreService
      * @throws \App\Exception\DisabledEntityException
      * @throws \App\Exception\NotFound
      * @throws \App\Exception\ServiceNotFoundException
-     * @throws \App\Exception\UnableToInvokeException
      */
     public function getById(string $storeId, bool $withCategories = false): array
     {
@@ -102,9 +97,8 @@ class StoreService
         if ($withCategories) {
             $dataGrabber = $this->factory
                 ->setServiceName('data_grabber')
-                ->setMethod('fetch')
                 ->createService();
-            $store['categories'] = $dataGrabber('categories_sync', 'categoryService', 'getByStoreId', $storeId);
+            $store['categories'] = $dataGrabber->fetch('categories_sync', 'categoryService', 'getByStoreId', $storeId);
         }
 
         return $store;

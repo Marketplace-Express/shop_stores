@@ -31,7 +31,11 @@ services:
 
   stores-unit-test:
     image: 'registry.gitlab.com/shop_ecommerce/shop_stores'
-    command: php vendor/symfony/phpunit-bridge/bin/simple-phpunit
+    command: >
+      bash -c "echo yes | php bin/console doctrine:fixtures:load > /dev/null
+      && vendor/bin/phpunit --bootstrap tests/bootstrap.php --configuration tests/phpunit.xml"
+    environment:
+      - APP_ENV=test
     volumes:
       - .:/src
       - /src/vendor

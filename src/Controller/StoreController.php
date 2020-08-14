@@ -143,9 +143,9 @@ class StoreController extends BaseController
                 $storeId,
                 $data['name'],
                 $data['description'],
-                $data['location'],
                 $data['photo'],
-                $data['coverPhoto']
+                $data['coverPhoto'],
+                $data['location']
             ));
         } catch (ValidationFailed $exception) {
             $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);

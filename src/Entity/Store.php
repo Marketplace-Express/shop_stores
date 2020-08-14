@@ -149,6 +149,14 @@ class Store implements ApiArrayData, DisableInterface
         $this->followers = new ArrayCollection();
     }
 
+    /**
+     * @param string $storeId
+     * For unit testing purposes only
+     */
+    public function setStoreId(string $storeId)
+    {
+        $this->storeId = $storeId;
+    }
 
     public function getStoreId(): string
     {

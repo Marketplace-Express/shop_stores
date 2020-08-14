@@ -8,7 +8,7 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false">
-    <testsuite name="shop_stores">
+    <testsuite name="shop_stores_test">
         <directory>./</directory>
         <exclude>../vendor</exclude>
     </testsuite>
@@ -20,5 +20,7 @@
     </filter>
     <php>
         <env name="SYMFONY_PHPUNIT_VERSION" value="7.4.4" />
+        <!-- the value is the FQCN of the application kernel -->
+        <env name="KERNEL_CLASS" value="App\Kernel" />
     </php>
 </phpunit>

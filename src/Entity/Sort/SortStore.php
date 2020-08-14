@@ -64,7 +64,7 @@ class SortStore
         }
 
         $this->sorting = array_filter($this->sorting, function ($attribute) {
-            return !empty($attribute) && !is_null($attribute);
+            return !empty($attribute);
         });
 
         return $this->sorting;
