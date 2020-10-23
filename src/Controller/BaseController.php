@@ -10,7 +10,10 @@ namespace App\Controller;
 
 use App\Controller\Validator\InputConstraints;
 use App\Exception\ValidationFailed;
+use App\Entity\Interfaces\ApiArrayData;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Validation;
 
@@ -34,15 +37,27 @@ class BaseController extends AbstractController
     }
 
     /**
-     * @param $message
+     * @param $content
      * @param int $code
-     * @return array
+     * @return JsonResponse
      */
-    public function getResponseScheme($message, int $code = Response::HTTP_OK): array
+    public function prepareResponse($content, int $code = Response::HTTP_OK): JsonResponse
     {
-        return [
+        $response = null; // initialize response variable
+
+        if ($content instanceof ApiArrayData) {
+            $response = $content->toApiArray();
+        }
+
+        if (is_array($content) || $content instanceof Collection) {
+            foreach ($content as $key => $item) {
+                $response[$key] = ($item instanceof ApiArrayData) ? $item->toApiArray() : $item;
+            }
+        }
+
+        return $this->json([
             'status' => $code,
-            'message' => $message
-        ];
+            'message' => $response ?? $content
+        ], $code);
     }
 }

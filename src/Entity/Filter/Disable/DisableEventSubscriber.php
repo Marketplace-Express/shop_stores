@@ -22,7 +22,7 @@ class DisableEventSubscriber implements EventSubscriber
     public function getSubscribedEvents()
     {
         return [
-            'preUpdate',
+            'preDisable',
             'postLoad'
         ];
     }
@@ -30,7 +30,7 @@ class DisableEventSubscriber implements EventSubscriber
     /**
      * @param EventArgs $args
      */
-    public function preUpdate(EventArgs $args)
+    public function preDisable(EventArgs $args)
     {
         $entity = $args->getObject();
         $entity->setDisabledAt(new \DateTime());

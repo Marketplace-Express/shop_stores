@@ -55,7 +55,7 @@ class StoreController extends BaseController
 
         try {
             $this->validateRequest($data, new CreateConstraints());
-            $response = $this->getResponseScheme($this->service->create(
+            $response = $this->prepareResponse($this->service->create(
                 $data['ownerId'],
                 $data['name'],
                 $data['description'],
@@ -65,14 +65,14 @@ class StoreController extends BaseController
                 $data['location']
             ));
         } catch (ValidationFailed $exception) {
-            $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
+            $response = $this->prepareResponse($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (UniqueConstraintViolationException $exception) {
-            $response = $this->getResponseScheme('Duplicate entry', Response::HTTP_UNPROCESSABLE_ENTITY);
+            $response = $this->prepareResponse('Duplicate entry', Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (\Throwable $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return $this->json($response, $response['status']);
+        return $response;
     }
 
     /**
@@ -89,18 +89,18 @@ class StoreController extends BaseController
         try {
             $this->validateRequest(array_merge($data, ['storeId' => $storeId]), new DisableConstraint());
             $this->service->disable($storeId, $data['disableReason'], $data['disableComment']);
-            return new Response(null, 204);
+            $response = new Response(null, 204);
         } catch (ValidationFailed $exception) {
-            $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
+            $response = $this->prepareResponse($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (NotFound $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_NOT_FOUND);
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_NOT_FOUND);
         } catch (DisabledEntityException $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (\Throwable $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return $this->json($response, $response['status']);
+        return $response;
     }
 
     /**
@@ -113,23 +113,24 @@ class StoreController extends BaseController
     {
         try {
             $this->validateRequest(['storeId' => $storeId], new GetByIdConstraint());
-            $response = $this->getResponseScheme($this->service->getById($storeId, true));
+            $response = $this->prepareResponse($this->service->getById($storeId, true));
         } catch (ValidationFailed $exception) {
-            $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
+            $response = $this->prepareResponse($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (NotFound $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_NOT_FOUND);
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_NOT_FOUND);
         } catch (DisabledEntityException $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (\Throwable $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return $this->json($response, $response['status']);
+        return $response;
     }
 
     /**
      * @param string $storeId
      * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      *
      * @Route("/{storeId}", methods={"PUT"}, name="update_one")
      */
@@ -139,7 +140,7 @@ class StoreController extends BaseController
 
         try {
             $this->validateRequest($data, new UpdateConstraint());
-            $response = $this->getResponseScheme($this->service->update(
+            $response = $this->prepareResponse($this->service->update(
                 $storeId,
                 $data['name'],
                 $data['description'],
@@ -148,16 +149,16 @@ class StoreController extends BaseController
                 $data['location']
             ));
         } catch (ValidationFailed $exception) {
-            $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
+            $response = $this->prepareResponse($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (NotFound $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_NOT_FOUND);
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_NOT_FOUND);
         } catch (DisabledEntityException $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (\Throwable $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return $this->json($response, $response['status']);
+        return $response;
     }
 
     /**
@@ -180,14 +181,14 @@ class StoreController extends BaseController
 
         try {
             $this->validateRequest($data, new GetAllConstraint());
-            $response = $this->getResponseScheme($this->service->getAll($page, $limit, new SortStore($sort)));
+            $response = $this->prepareResponse($this->service->getAll($page, $limit, new SortStore($sort)));
         } catch (ValidationFailed $exception) {
-            $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
+            $response = $this->prepareResponse($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (\Throwable $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return $this->json($response, $response['status']);
+        return $response;
     }
 
     /**
@@ -200,15 +201,15 @@ class StoreController extends BaseController
         try {
             $this->validateRequest(['storeId' => $storeId], new DeleteConstraint());
             $this->service->delete($storeId);
-            return new Response(null, 204);
+            $response = new Response(null, 204);
         } catch (ValidationFailed $exception) {
-            $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
+            $response = $this->prepareResponse($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (NotFound $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_NOT_FOUND);
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_NOT_FOUND);
         } catch (\Throwable $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return $this->json($response);
+        return $response;
     }
 }

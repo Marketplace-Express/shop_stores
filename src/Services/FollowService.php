@@ -88,6 +88,7 @@ class FollowService
      */
     public function unFollow(string $storeId, string $followerId): void
     {
-        $this->followerRepository->unFollow($storeId, $followerId);
+        $store = $this->storeRepository->getById($storeId);
+        $this->followerRepository->unFollow($store, $followerId);
     }
 }

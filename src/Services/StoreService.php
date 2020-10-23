@@ -39,14 +39,14 @@ class StoreService
      * @param string|null $photo
      * @param string|null $coverPhoto
      * @param array $location
-     * @return array
+     * @return \App\Entity\Store
      *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function create(string $ownerId, string $name, string $description, int $type, ?string $photo, ?string $coverPhoto, array $location = []): array
+    public function create(string $ownerId, string $name, string $description, int $type, ?string $photo, ?string $coverPhoto, array $location = [])
     {
-        return $this->repository->create($ownerId, $name, $description, $type, $photo, $coverPhoto, $location)->toApiArray();
+        return $this->repository->create($ownerId, $name, $description, $type, $photo, $coverPhoto, $location);
     }
 
     /**
@@ -56,16 +56,17 @@ class StoreService
      * @param string|null $photo
      * @param string|null $coverPhoto
      * @param array|null $location
-     * @return array
+     * @return \App\Entity\Store
+     *
      * @throws \App\Exception\DisabledEntityException
      * @throws \App\Exception\NotFound
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
      */
-    public function update(string $storeId, ?string $name, ?string $description, ?string $photo, ?string $coverPhoto, ?array $location): array
+    public function update(string $storeId, ?string $name, ?string $description, ?string $photo, ?string $coverPhoto, ?array $location)
     {
-        return $this->repository->update($storeId, $name, $description, $location, $photo, $coverPhoto)->toApiArray();
+        return $this->repository->update($storeId, $name, $description, $location, $photo, $coverPhoto);
     }
 
     /**
@@ -84,24 +85,13 @@ class StoreService
 
     /**
      * @param string $storeId
-     * @param bool $withCategories
-     * @return array
+     * @return \App\Entity\Store
      * @throws \App\Exception\DisabledEntityException
      * @throws \App\Exception\NotFound
-     * @throws \App\Exception\ServiceNotFoundException
      */
-    public function getById(string $storeId, bool $withCategories = false): array
+    public function getById(string $storeId)
     {
-        $store = $this->repository->getById($storeId)->toApiArray();
-
-        if ($withCategories) {
-            $dataGrabber = $this->factory
-                ->setServiceName('data_grabber')
-                ->createService();
-            $store['categories'] = $dataGrabber->fetch('categories_sync', 'categoryService', 'getByStoreId', $storeId);
-        }
-
-        return $store;
+        return $this->repository->getById($storeId);
     }
 
     /**
@@ -113,10 +103,7 @@ class StoreService
      */
     public function getAll(int $page, int $limit, ?SortStore $sort): array
     {
-        $result = $this->repository->getAll($page, $limit, $sort);
-        return array_map(function ($store) {
-            return $store->toApiArray();
-        }, $result['stores']);
+        return $this->repository->getAll($page, $limit, $sort)['stores'];
     }
 
     /**

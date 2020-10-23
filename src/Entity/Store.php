@@ -349,6 +349,7 @@ class Store implements ApiArrayData, DisableInterface
         if (!$this->followers->contains($follower)) {
             $this->followers[] = $follower;
             $follower->setStore($this);
+            $this->followersCount++;
         }
 
         return $this;
@@ -359,9 +360,10 @@ class Store implements ApiArrayData, DisableInterface
         if ($this->followers->contains($follower)) {
             $this->followers->removeElement($follower);
             // set the owning side to null (unless already changed)
-            if ($follower->getStore() === $this) {
+            if ($follower->getStore()->storeId === $this->storeId) {
                 $follower->setStore(null);
             }
+            $this->followersCount--;
         }
 
         return $this;

@@ -15,6 +15,9 @@ use App\Exception\DisabledEntityException;
 use App\Exception\NotFound;
 use App\Repository\Traits\SqlLoggingTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\EventArgs;
+use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -87,7 +90,7 @@ class StoreRepository extends ServiceEntityRepository
     /**
      * @param string $storeId
      * @param bool $getDisabled
-     * @return Store|null
+     * @return Store
      * @throws NotFound
      * @throws DisabledEntityException
      */
@@ -122,6 +125,10 @@ class StoreRepository extends ServiceEntityRepository
         $store->setDisableReason($disableReason);
         $store->setDisableComment($disableComment);
 
+        $this->getEntityManager()->getEventManager()->dispatchEvent(
+            'preDisable', new LifecycleEventArgs($store, $this->getEntityManager())
+        );
+
         $this->getEntityManager()->persist($store);
         $this->getEntityManager()->flush();
     }
@@ -146,7 +153,7 @@ class StoreRepository extends ServiceEntityRepository
      * @param array|null $locationData
      * @param string|null $photoUrl
      * @param string|null $coverPhotoUrl
-     * @return Store|null
+     * @return Store
      * @throws NotFound
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -206,13 +213,15 @@ class StoreRepository extends ServiceEntityRepository
         // Get disabled stores
         $this->getEntityManager()->getConfiguration()->setDefaultQueryHint('withDisabled', true);
 
-        $more = false;
-
         $query = $this->getEntityManager()->createQueryBuilder()
             ->from('App:Store', 's')
             ->select('s')
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
+
+        if ($sort) {
+            $query->orderBy('s.name', 'DESC');
+        }
 
         $paginator = new Paginator($query);
 
@@ -223,7 +232,7 @@ class StoreRepository extends ServiceEntityRepository
         return [
             'stores' => $paginator->getIterator()->getArrayCopy(),
             'count' => $paginator->count(),
-            'more' => $more
+            'more' => !empty($more)
         ];
     }
 

@@ -26,6 +26,13 @@ RUN chmod +x utilities/install-dependencies.sh && ./utilities/install-dependenci
 # Install required PHP extensions
 RUN chmod +x utilities/install-php-extensions.sh && ./utilities/install-php-extensions.sh
 
+# Install composer & dependencies
+RUN echo "Installing Composer" && rm -rf vendor composer.lock && \
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    composer clearcache && \
+    composer config -g github-oauth.github.com 3f6fd65b0d7958581f549b862ee49af9db1bcdf1 && \
+    composer install
+
 # Download Symfony CLI
 RUN echo "Installing Symfony CLI" && wget https://get.symfony.com/cli/installer -O - | bash && \
     mv /root/.symfony/bin/symfony /usr/local/bin/symfony && \
@@ -33,12 +40,5 @@ RUN echo "Installing Symfony CLI" && wget https://get.symfony.com/cli/installer 
     adduser --no-create-home --force-badname --disabled-login --disabled-password --system _www; \
     addgroup _www _www && \
     symfony check:requirements
-
-# Install composer & dependencies
-RUN echo "Installing Composer" && rm -rf vendor composer.lock && \
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
-    composer clearcache && \
-    composer config -g github-oauth.github.com 3f6fd65b0d7958581f549b862ee49af9db1bcdf1 && \
-    composer install
 
 ENTRYPOINT ["/bin/bash", "utilities/docker-entrypoint.sh"]

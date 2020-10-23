@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-if [ ! -f .env ]; then
-    cp .env.example .env
-fi
-
 # Executing migrations
 php bin/console doctrine:migrations:migrate --no-interaction
 

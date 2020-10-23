@@ -53,20 +53,20 @@ class FollowController extends BaseController
         try {
             $this->validateRequest($data, new FollowConstraint());
             $this->service->follow($data['storeId'], $data['followerId']);
-            return new Response(null, Response::HTTP_NO_CONTENT);
+            $response = new Response(null, Response::HTTP_NO_CONTENT);
         } catch (ValidationFailed $exception) {
-            $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
+            $response = $this->prepareResponse($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (NotFound $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_NOT_FOUND);
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_NOT_FOUND);
         } catch (DisabledEntityException $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (UniqueConstraintViolationException $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_BAD_REQUEST);
+            $response = $this->prepareResponse('already followed', Response::HTTP_BAD_REQUEST);
         } catch (\Throwable $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return $this->json($response, $response['status']);
+        return $response;
     }
 
     /**
@@ -87,14 +87,14 @@ class FollowController extends BaseController
         try {
             $this->validateRequest($data, new GetFollowersConstraint());
             $followers = $this->service->getFollowers($data['storeId'], $data['limit'], $data['page']);
-            $response = $this->getResponseScheme($followers);
+            $response = $this->prepareResponse($followers);
         } catch (ValidationFailed $exception) {
-            $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
+            $response = $this->prepareResponse($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (\Throwable $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return $this->json($response, $response['status']);
+        return $response;
     }
 
     /**
@@ -114,14 +114,14 @@ class FollowController extends BaseController
         try {
             $this->validateRequest($data, new GetFollowedStoresConstraint());
             $followedStores = $this->service->getFollowedStores($data['followerId'], $data['limit'], $data['page']);
-            $response = $this->getResponseScheme($followedStores);
+            $response = $this->prepareResponse($followedStores);
         } catch (ValidationFailed $exception) {
-            $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
+            $response = $this->prepareResponse($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (\Throwable $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return $this->json($response, $response['status']);
+        return $response;
     }
 
     /**
@@ -137,13 +137,13 @@ class FollowController extends BaseController
         try {
             $this->validateRequest($data, new UnFollowConstraint());
             $this->service->unFollow($data['storeId'], $data['followerId']);
-            return new Response(null, Response::HTTP_NO_CONTENT);
+            $response = new Response(null, Response::HTTP_NO_CONTENT);
         } catch (ValidationFailed $exception) {
-            $response = $this->getResponseScheme($exception->errors, Response::HTTP_BAD_REQUEST);
+            $response = $this->prepareResponse($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (\Throwable $exception) {
-            $response = $this->getResponseScheme($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return $this->json($response, $response['status']);
+        return $response;
     }
 }

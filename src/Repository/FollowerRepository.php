@@ -50,6 +50,26 @@ class FollowerRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param Store $store
+     * @param string $followerId
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function unFollow(Store $store, string $followerId): void
+    {
+        $follower = $this->findOneBy(['followerId' => $followerId, 'store' => $store]);
+
+        if (!$follower) {
+            return;
+        }
+
+        $store->removeFollower($follower);
+
+        $this->getEntityManager()->persist($store);
+        $this->getEntityManager()->flush();
+    }
+
+    /**
      * @param string $followerId
      * @param int $limit
      * @param int $page
@@ -72,24 +92,6 @@ class FollowerRepository extends ServiceEntityRepository
             'stores' => $paginator->getIterator()->getArrayCopy(),
             'count' => $paginator->count()
         ];
-    }
-
-    /**
-     * @param string $storeId
-     * @param string $followerId
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     */
-    public function unFollow(string $storeId, string $followerId): void
-    {
-        $follower = $this->findOneBy(['followerId' => $followerId, 'store' => $storeId]);
-
-        if (!$follower) {
-            return;
-        }
-
-        $this->getEntityManager()->remove($follower);
-        $this->getEntityManager()->flush();
     }
 
     /**

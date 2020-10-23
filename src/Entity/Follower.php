@@ -15,7 +15,6 @@ class Follower implements ApiArrayData
 
     /**
      * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="UUID")
      * @ORM\Column(type="string", length=36)
      */
     private $followerId;

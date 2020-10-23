@@ -83,16 +83,26 @@ class SortStore
     }
 
     /**
-     * @return array
+     * @return array|string
      * @throws \Exception
      */
-    public function getSqlSort(): array
+    public function getSqlSort(bool $asString = false)
     {
         $this->prepareSorting();
         $this->prepareDirection();
         if (empty($this->sorting)) {
             throw new \Exception('Invalid sorting arguments', 400);
         }
+
+        if ($asString) {
+            $sortAsString = [];
+            foreach ($this->sorting as $field => $order) {
+                $sortAsString[] = $field . ' ' . $order;
+            }
+
+            return join(',', $sortAsString);
+        }
+
         return $this->sorting;
     }
 }
