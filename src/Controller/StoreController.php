@@ -13,6 +13,7 @@ use App\Controller\Validator\Store\DeleteConstraint;
 use App\Controller\Validator\Store\DisableConstraint;
 use App\Controller\Validator\Store\GetAllConstraint;
 use App\Controller\Validator\Store\GetByIdConstraint;
+use App\Controller\Validator\Store\IsStoreOwnerConstraint;
 use App\Controller\Validator\Store\UpdateConstraint;
 use App\Entity\Sort\SortStore;
 use App\Exception\DisabledEntityException;
@@ -113,7 +114,7 @@ class StoreController extends BaseController
     {
         try {
             $this->validateRequest(['storeId' => $storeId], new GetByIdConstraint());
-            $response = $this->prepareResponse($this->service->getById($storeId, true));
+            $response = $this->prepareResponse($this->service->getById($storeId));
         } catch (ValidationFailed $exception) {
             $response = $this->prepareResponse($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (NotFound $exception) {
@@ -139,7 +140,7 @@ class StoreController extends BaseController
         $data = json_decode($request->getContent(), true);
 
         try {
-            $this->validateRequest($data, new UpdateConstraint());
+            $this->validateRequest(array_merge(['storeId' => $storeId], $data), new UpdateConstraint());
             $response = $this->prepareResponse($this->service->update(
                 $storeId,
                 $data['name'],
@@ -206,6 +207,30 @@ class StoreController extends BaseController
             $response = $this->prepareResponse($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (NotFound $exception) {
             $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_NOT_FOUND);
+        } catch (\Throwable $exception) {
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return $response;
+    }
+
+    /**
+     * @Route("/{storeId}/isOwner", methods={"GET"}, name="is_store_owner")
+     *
+     * @param string $storeId
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function isStoreOwner(string $storeId, Request $request)
+    {
+        $data = json_decode($request->getContent(), true);
+
+        try {
+            $this->validateRequest(array_merge(['storeId' => $storeId], $data), new IsStoreOwnerConstraint());
+            $isStoreOwner = $this->service->isStoreOwner($data['user_id'], $storeId);
+            $response = $this->prepareResponse($isStoreOwner);
+        } catch (ValidationFailed $exception) {
+            $response = $this->prepareResponse($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (\Throwable $exception) {
             $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

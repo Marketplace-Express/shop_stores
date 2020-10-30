@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Follower;
 use App\Entity\Store;
+use App\Exception\CantFollowStore;
 use App\Repository\Traits\SqlLoggingTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
@@ -37,9 +38,13 @@ class FollowerRepository extends ServiceEntityRepository
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws UniqueConstraintViolationException
+     * @throws CantFollowStore
      */
     public function follow(Store $store, string $followerId)
     {
+        if ($store->getOwnerId() == $followerId) {
+            throw new CantFollowStore('owner try to follow store');
+        }
         $follower = new Follower();
         $follower->setFollowerId($followerId);
 
@@ -118,6 +123,19 @@ class FollowerRepository extends ServiceEntityRepository
             'followers' => $paginator->getIterator()->getArrayCopy(),
             'count' => $paginator->count()
         ];
+    }
+
+    public function removeFollowers(array $followersIds, string $storeId)
+    {
+        if (empty($followersIds)) {
+            return;
+        }
+
+        $this->getEntityManager()->createQueryBuilder()
+            ->delete('App:Follower', 'f')
+            ->where('f.store = :storeId AND f.followerId IN (:followersIds)')
+            ->setParameters(['storeId' => $storeId, 'followersIds' => $followersIds])
+            ->getQuery()->getResult();
     }
 
     // /**

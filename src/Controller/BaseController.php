@@ -55,6 +55,10 @@ class BaseController extends AbstractController
             }
         }
 
+        if ($_ENV['APP_ENV'] !== 'dev' && $code == Response::HTTP_INTERNAL_SERVER_ERROR) {
+            $response = 'internal server error';
+        }
+
         return $this->json([
             'status' => $code,
             'message' => $response ?? $content

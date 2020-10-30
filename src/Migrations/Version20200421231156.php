@@ -48,8 +48,8 @@ final class Version20200421231156 extends AbstractMigration
         $table->setPrimaryKey(['store_id']);
 
         // Create unique index
-        $table->addUniqueIndex(['owner_id', 'deletion_token'], 'unique_store_index');
         $table->addUniqueIndex(['location_id'], 'unique_location_index');
+        $table->addUniqueIndex(['name', 'deletion_token'], 'unique_store_name');
 
         // Add foreign key constraint
         $table->addForeignKeyConstraint(self::REFERENCED_TABLE_LOCATIONS, ['location_id'], ['location_id']);

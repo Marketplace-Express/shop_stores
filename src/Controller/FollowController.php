@@ -10,7 +10,9 @@ namespace App\Controller;
 use App\Controller\Validator\Follow\FollowConstraint;
 use App\Controller\Validator\Follow\GetFollowedStoresConstraint;
 use App\Controller\Validator\Follow\GetFollowersConstraint;
+use App\Controller\Validator\Follow\RemoveStoreFollowersConstraint;
 use App\Controller\Validator\Follow\UnFollowConstraint;
+use App\Exception\CantFollowStore;
 use App\Exception\DisabledEntityException;
 use App\Exception\NotFound;
 use App\Exception\ValidationFailed;
@@ -41,18 +43,19 @@ class FollowController extends BaseController
     }
 
     /**
+     * @param string $storeId
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      *
-     * @Route("/", methods={"POST"}, name="follow")
+     * @Route("/{storeId}", methods={"POST"}, name="follow")
      */
-    public function follow(Request $request)
+    public function follow(string $storeId, Request $request)
     {
         $data = json_decode($request->getContent(), true);
 
         try {
-            $this->validateRequest($data, new FollowConstraint());
-            $this->service->follow($data['storeId'], $data['followerId']);
+            $this->validateRequest(array_merge($data, ['storeId' => $storeId]), new FollowConstraint());
+            $this->service->follow($storeId, $data['followerId']);
             $response = new Response(null, Response::HTTP_NO_CONTENT);
         } catch (ValidationFailed $exception) {
             $response = $this->prepareResponse($exception->errors, Response::HTTP_BAD_REQUEST);
@@ -60,8 +63,33 @@ class FollowController extends BaseController
             $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_NOT_FOUND);
         } catch (DisabledEntityException $exception) {
             $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (CantFollowStore $exception) {
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_BAD_REQUEST);
         } catch (UniqueConstraintViolationException $exception) {
             $response = $this->prepareResponse('already followed', Response::HTTP_BAD_REQUEST);
+        } catch (\Throwable $exception) {
+            $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return $response;
+    }
+
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
+     *
+     * @Route("/unfollow", methods={"DELETE"}, name="unfollow")
+     */
+    public function unFollow(Request $request)
+    {
+        $data = json_decode($request->getContent(), true);
+
+        try {
+            $this->validateRequest($data, new UnFollowConstraint());
+            $this->service->unFollow($data['storeId'], $data['followerId']);
+            $response = new Response(null, Response::HTTP_NO_CONTENT);
+        } catch (ValidationFailed $exception) {
+            $response = $this->prepareResponse($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (\Throwable $exception) {
             $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -125,21 +153,17 @@ class FollowController extends BaseController
     }
 
     /**
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
+     * @Route("/{storeId}/followers", methods={"DELETE"}, name="remove_store_followers")
      *
-     * @Route("/unfollow", methods={"DELETE"}, name="unfollow")
+     * @param string $storeId
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
-    public function unFollow(Request $request)
+    public function removeFollowers(string $storeId)
     {
-        $data = json_decode($request->getContent(), true);
-
         try {
-            $this->validateRequest($data, new UnFollowConstraint());
-            $this->service->unFollow($data['storeId'], $data['followerId']);
+            $this->validateRequest(['storeId' => $storeId], new RemoveStoreFollowersConstraint());
+            $this->service->removeFollowers($storeId);
             $response = new Response(null, Response::HTTP_NO_CONTENT);
-        } catch (ValidationFailed $exception) {
-            $response = $this->prepareResponse($exception->errors, Response::HTTP_BAD_REQUEST);
         } catch (\Throwable $exception) {
             $response = $this->prepareResponse($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

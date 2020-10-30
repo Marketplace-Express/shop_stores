@@ -43,6 +43,7 @@ services:
         class: App\Entity\EventListeners\StoreEventListener
         tags:
             - { name: doctrine.event_listener, event: preSoftDelete }
+            - { name: doctrine.event_listener, event: postSoftDelete }
 
     disable:
         class: App\Entity\Filter\Disable\DisableEventSubscriber
@@ -61,8 +62,8 @@ services:
         public: true
         lazy: true
 
-    app.data_grabber_service:
-        class: App\Services\DataGrabberService
+    app.caller_service:
+        class: App\Services\CallerService
         public: true
         lazy: true
 

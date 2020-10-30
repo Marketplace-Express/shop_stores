@@ -15,9 +15,8 @@ use App\Exception\DisabledEntityException;
 use App\Exception\NotFound;
 use App\Repository\Traits\SqlLoggingTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\EventArgs;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -53,6 +52,7 @@ class StoreRepository extends ServiceEntityRepository
      * @return Store
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws UniqueConstraintViolationException
      */
     public function create(
         string $ownerId,
@@ -234,6 +234,32 @@ class StoreRepository extends ServiceEntityRepository
             'count' => $paginator->count(),
             'more' => !empty($more)
         ];
+    }
+
+    /**
+     * @param string $userId
+     * @param string $storeId
+     * @return Store
+     * @throws NotFound
+     */
+    public function getStoreByUserId(string $userId, string $storeId)
+    {
+        $store = $this->findOneBy(['storeId' => $storeId, 'ownerId' => $userId]);
+
+        if (!$store) {
+            throw new NotFound('store not found or maybe deleted');
+        }
+
+        return $store;
+    }
+
+    /**
+     * @param string $name
+     * @return Store|null
+     */
+    public function findByName(string $name)
+    {
+        return $this->findOneBy(['name' => $name]);
     }
 
     // /**

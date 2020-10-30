@@ -38,6 +38,7 @@ class FollowService
      * @throws \Doctrine\DBAL\Exception\UniqueConstraintViolationException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \App\Exception\CantFollowStore
      */
     public function follow(string $storeId, string $followerId): void
     {
@@ -71,13 +72,7 @@ class FollowService
      */
     public function getFollowedStores(string $followerId, int $limit, int $page): array
     {
-        $followedStores = $this->followerRepository->followedStores($followerId, $limit, $page);
-
-        $followedStores['stores'] = array_map(function ($store) {
-            return $store->getStore()->toApiArray();
-        }, $followedStores['stores']);
-
-        return $followedStores;
+        return $this->followerRepository->followedStores($followerId, $limit, $page);
     }
 
     /**
@@ -90,5 +85,19 @@ class FollowService
     {
         $store = $this->storeRepository->getById($storeId);
         $this->followerRepository->unFollow($store, $followerId);
+    }
+
+    /**
+     * @param string $storeId
+     * @throws \Exception
+     */
+    public function removeFollowers(string $storeId)
+    {
+        $page = 1;
+        while($followers = $this->followerRepository->getFollowers($storeId, 1000, $page)['followers']) {
+            $followersIds = array_map(function($follower) { return $follower->getFollowerId(); }, $followers);
+            $this->followerRepository->removeFollowers($followersIds, $storeId);
+            $page++;
+        }
     }
 }

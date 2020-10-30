@@ -9,7 +9,9 @@ use App\Enums\StoreType;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Url;
+use Symfony\Component\Validator\Constraints\Uuid;
 use Symfony\Component\Validator\Context\ExecutionContext;
 
 class UpdateConstraint extends CommonDataValidator implements InputConstraints
@@ -18,6 +20,7 @@ class UpdateConstraint extends CommonDataValidator implements InputConstraints
     public function getConstraints(): Collection
     {
         return new Collection([
+            'storeId' => [new NotBlank(), new Uuid()],
             'name' => [new Length(['allowEmptyString' => true, 'max' => 100]), new Callback(['callback' => function ($name, ExecutionContext $context) {
                 return $this->validateText($name, $context, 'name');
             }])],

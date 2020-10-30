@@ -9,7 +9,9 @@ namespace App\Services;
 
 
 use App\Entity\Sort\SortStore;
+use App\Exception\NotFound;
 use App\Repository\StoreRepository;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 
 class StoreService
@@ -17,18 +19,13 @@ class StoreService
     /** @var StoreRepository */
     private $repository;
 
-    /** @var ServiceFactory */
-    private $factory;
-
     /**
      * StoreService constructor.
      * @param EntityManagerInterface $entityManager
-     * @param ServiceFactory $factory
      */
-    public function __construct(EntityManagerInterface $entityManager, ServiceFactory  $factory)
+    public function __construct(EntityManagerInterface $entityManager)
     {
         $this->repository = $entityManager->getRepository('App:Store');
-        $this->factory = $factory;
     }
 
     /**
@@ -43,6 +40,7 @@ class StoreService
      *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws UniqueConstraintViolationException
      */
     public function create(string $ownerId, string $name, string $description, int $type, ?string $photo, ?string $coverPhoto, array $location = [])
     {
@@ -108,13 +106,29 @@ class StoreService
 
     /**
      * @param string $storeId
+     * @throws NotFound
      * @throws \App\Exception\DisabledEntityException
-     * @throws \App\Exception\NotFound
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function delete(string $storeId)
     {
         $this->repository->delete($storeId);
+    }
+
+    /**
+     * @param string $userId
+     * @param string $storeId
+     * @return bool
+     */
+    public function isStoreOwner(string $userId, string $storeId): bool
+    {
+        try {
+            $this->repository->getStoreByUserId($userId, $storeId);
+        } catch (NotFound $exception) {
+            return false;
+        }
+
+        return true;
     }
 }
