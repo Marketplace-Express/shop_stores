@@ -72,7 +72,13 @@ class FollowService
      */
     public function getFollowedStores(string $followerId, int $limit, int $page): array
     {
-        return $this->followerRepository->followedStores($followerId, $limit, $page);
+        $stores = $this->followerRepository->followedStores($followerId, $limit, $page);
+
+        $stores['stores'] = array_map(function ($store) {
+            return $store->getStore();
+        }, $stores['stores']);
+
+        return $stores;
     }
 
     /**

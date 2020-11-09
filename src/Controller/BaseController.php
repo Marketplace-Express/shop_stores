@@ -50,9 +50,9 @@ class BaseController extends AbstractController
         }
 
         if (is_array($content) || $content instanceof Collection) {
-            foreach ($content as $key => $item) {
-                $response[$key] = ($item instanceof ApiArrayData) ? $item->toApiArray() : $item;
-            }
+            array_walk_recursive($content, function (&$value) {
+                $value = ($value instanceof ApiArrayData) ? $value->toApiArray() : $value;
+            });
         }
 
         if ($_ENV['APP_ENV'] !== 'dev' && $code == Response::HTTP_INTERNAL_SERVER_ERROR) {
