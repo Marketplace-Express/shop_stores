@@ -13,7 +13,7 @@ services:
 
   stores-sync:
     image: 'registry.gitlab.com/shop_ecommerce/shop_stores'
-    command: bash -c "php bin/console sync_worker | php -S 0.0.0.0:8000 -t public/"
+    command: php bin/console sync_worker
     volumes:
       - .:/src
       - /src/vendor
@@ -22,7 +22,7 @@ services:
 
   stores-async:
     image: 'registry.gitlab.com/shop_ecommerce/shop_stores'
-    command: bash -c "php bin/console async_worker | php -S 0.0.0.0:8000 -t public/"
+    command: php bin/console async_worker
     volumes:
       - .:/src
       - /src/vendor
