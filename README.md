@@ -36,23 +36,9 @@ JURRY_RABBIT_MQ_DSN=tcp://guest:guest@172.18.0.1:5672
 And so on for Redis and RabbitMQ ...
 >Note: You can use network (marketplace-network) gateway ip instead of providing each container ip
 
----
-
-3- Login to docker registry provider, in order to pull this micro service docker image:
-```bash
-docker login registry.gitlab.com
-```
-Provide your user name and password on gitlab, you should have access to the project, so you can pull the image.
-
-4- Pull the docker image from container registry:
-```bash
-docker pull registry.gitlab.com/shop_ecommerce/shop_stores
-```
-Provide your user name and password on gitlab, you should have access to the project, so you can pull the image.
-
----
+3- Run `docker-compose build` to build the docker image for this repository.
        
-5- Run `docker-compose up -d`, This command will create new containers:
+4- Run `docker-compose up -d`, This command will create new containers:
 
 1. shop_stores_stores-sync_1:
 - This will declare a new queue “stores_sync” in RabbitMQ queues list
