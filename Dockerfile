@@ -30,7 +30,6 @@ RUN chmod +x utilities/install-php-extensions.sh && ./utilities/install-php-exte
 RUN echo "Installing Composer" && rm -rf vendor composer.lock && \
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
     composer clearcache && \
-    composer config -g github-oauth.github.com 3f6fd65b0d7958581f549b862ee49af9db1bcdf1 && \
     composer install
 
 # Download Symfony CLI
