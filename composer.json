@@ -65,7 +65,10 @@
     "symfony/polyfill-php56": "*"
   },
   "scripts": {
-    "post-root-package-install": [
+    "pre-install-cmd": [
+      "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+    ],
+    "pre-update-cmd": [
       "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
     ]
   },

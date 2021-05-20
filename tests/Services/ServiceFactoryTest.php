@@ -7,7 +7,7 @@
 
 namespace App\Tests\Services;
 
-use App\Services\DataGrabberService;
+
 use App\Services\FollowService;
 use App\Services\ServiceFactory;
 use App\Services\StoreService;
@@ -28,7 +28,6 @@ class ServiceFactoryTest extends KernelTestCase
         return [
             ['follow', 'expected' => FollowService::class],
             ['store', 'expected' => StoreService::class],
-            ['data_grabber', 'expected' => DataGrabberService::class]
         ];
     }
 

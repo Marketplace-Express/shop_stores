@@ -1,20 +1,20 @@
 version: '3.3'
 services:
   stores-api:
+    image: marketplace_shop_stores
     build:
       context: .
     command: symfony serve
     volumes:
       - .:/src
       - /src/vendor
-    ports:
-      - "1002:8000"
     environment:
       - PHP_IDE_CONFIG=serverName=docker
+    ports:
+      - "1002:8000"
 
   stores-sync:
-    build:
-      context: .
+    image: marketplace_shop_stores
     command: php bin/console sync_worker
     volumes:
       - .:/src
@@ -25,8 +25,7 @@ services:
       - stores-api
 
   stores-async:
-    build:
-      context: .
+    image: marketplace_shop_stores
     command: php bin/console async_worker
     volumes:
       - .:/src
@@ -37,13 +36,13 @@ services:
       - stores-api
 
   stores-unit-test:
-    build:
-      context: .
+    image: marketplace_shop_stores
     command: >
       bash -c "echo yes | php bin/console doctrine:fixtures:load > /dev/null
       && vendor/bin/phpunit --bootstrap tests/bootstrap.php --configuration tests/phpunit.xml"
     environment:
       - APP_ENV=test
+      - UNIT_TEST=1
     volumes:
       - .:/src
       - /src/vendor

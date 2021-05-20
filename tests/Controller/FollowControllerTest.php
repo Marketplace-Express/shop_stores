@@ -56,7 +56,7 @@ class FollowControllerTest extends KernelTestCase
         $this->requestMock->setContent(json_encode(['storeId' => self::STORE_ID, 'followerId' => self::USER_ID]));
 
         $controller = $this->getController($serviceMock);
-        $controller->follow($this->requestMock);
+        $controller->follow(self::STORE_ID, $this->requestMock);
     }
 
     public function testGetFollowers()

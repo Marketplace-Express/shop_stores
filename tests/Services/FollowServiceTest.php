@@ -17,7 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class FollowServiceTest extends KernelTestCase
 {
-    const STORE_ID = 'f58031e2-a1bb-11ea-ac38-0242ac120002';
+    const STORE_ID = 'e4261f27-b99a-11eb-948f-0242ac120003';
     const USER_ID = '11845af3-db45-11ea-a2b4-0242ac120002';
 
     /**
@@ -113,10 +113,18 @@ class FollowServiceTest extends KernelTestCase
 
     public function testUnFollow()
     {
-        $followerRepositoryMock = $this->getFollowRepositoryMock(['unfollow']);
-        $followerRepositoryMock->expects(self::once())->method('unfollow')->with(self::STORE_ID, self::USER_ID);
+        $store = new Store();
+        $store->setStoreId(self::STORE_ID);
 
-        $followServiceMock = $this->getFollowService($followerRepositoryMock);
-        $followerRepositoryMock->unFollow(self::STORE_ID, self::USER_ID);
+        $followerRepositoryMock = $this->getFollowRepositoryMock(['unfollow']);
+        $followerRepositoryMock->expects(self::once())->method('unfollow')->with($store, self::USER_ID);
+
+        $storeRepositoryMock = $this->getStoreRepositoryMock(['getById']);
+        $storeRepositoryMock->expects(self::once())->method('getById')->with(self::STORE_ID)->willReturn($store);
+
+
+        $followServiceMock = $this->getFollowService($followerRepositoryMock, $storeRepositoryMock);
+
+        $followServiceMock->unFollow(self::STORE_ID, self::USER_ID);
     }
 }
