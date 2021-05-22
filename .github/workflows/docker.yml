@@ -58,11 +58,7 @@ jobs:
               run: cp .env.example .env
             - name: Replace environment variables
               run: |
-                  sed -i 's/MYSQL_HOST.*/MYSQL_HOST=${{ steps.github-network.outputs.gateway-address }}/g' .env
-                  sed -i 's/MYSQL_PORT.*/MYSQL_PORT=${{ job.services.mysql.ports[3306] }}/g' .env
-                  sed -i 's/MYSQL_USER.*/MYSQL_USER=${{ env.MYSQL_TEST_USER }}/g' .env
-                  sed -i 's/MYSQL_PASSWORD.*/MYSQL_PASSWORD=${{ env.MYSQL_TEST_PASSWORD }}/g' .env
-                  sed -i 's/MYSQL_DATABASE.*/MYSQL_DATABASE=${{ env.MYSQL_TEST_DB }}/g' .env
+                  sed -i 's,DATABASE_URL.*,DATABASE_URL=mysql://${{ env.MYSQL_TEST_USER }}:${{ env.MYSQL_TEST_PASSWORD }}@${{ steps.github-network.outputs.gateway-address }}:${{ job.services.mysql.ports[3306] }}/${{ env.MYSQL_TEST_DB }}?serverVersion=8.0,g' .env
             - name: Build docker image
               run: docker build -t marketplace_shop_stores .
             - name: Running unit test
