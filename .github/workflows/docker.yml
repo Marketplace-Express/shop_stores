@@ -59,6 +59,8 @@ jobs:
             - name: Replace environment variables
               run: |
                   sed -i 's,DATABASE_URL.*,DATABASE_URL=mysql://${{ env.MYSQL_TEST_USER }}:${{ env.MYSQL_TEST_PASSWORD }}@${{ steps.github-network.outputs.gateway-address }}:${{ job.services.mysql.ports[3306] }}/${{ env.MYSQL_TEST_DB }}?serverVersion=8.0,g' .env
+            - name: print .env content
+              run: cat .env
             - name: Build docker image
               run: docker build -t marketplace_shop_stores .
             - name: Running unit test
