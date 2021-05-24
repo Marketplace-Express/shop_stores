@@ -33,34 +33,21 @@ jobs:
             mysql:
                 image: mysql:8
                 ports:
-                    - 3306
+                    - 3306:3306
                 options: --health-cmd="mysqladmin ping"
                          --health-interval=5s
                          --health-timeout=2s
                          --health-retries=3
                          -e MYSQL_ALLOW_EMPTY_PASSWORD=yes
-                         -e MYSQL_USER=phalcon
+                         -e MYSQL_USER=shop_stores
                          -e MYSQL_PASSWORD=secret
                          -e MYSQL_DATABASE=shop_stores_test
                          --entrypoint sh mysql:8 -c "exec docker-entrypoint.sh mysqld --default-authentication-plugin=mysql_native_password"
         steps:
-            - name: Get MySQL service ID
-              id: mysql-service
-              run: echo "::set-output name=container-id::$(docker ps | grep -i mysql | awk '{print $1}')"
-            - name: Get Github network gateway address
-              id: github-network
-              run: echo "::set-output name=gateway-address::$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.Gateway}}{{end}}' ${{ steps.mysql-service.outputs.container-id }})"
             - name: Create docker network
               run: docker network create marketplace-network
             - name: Check out Site Repository 📄
               uses: actions/checkout@v2
-            - name: Create .env file
-              run: cp .env.example .env
-            - name: Replace environment variables
-              run: |
-                  sed -i 's,DATABASE_URL.*,DATABASE_URL=mysql://${{ env.MYSQL_TEST_USER }}:${{ env.MYSQL_TEST_PASSWORD }}@${{ steps.github-network.outputs.gateway-address }}:${{ job.services.mysql.ports[3306] }}/${{ env.MYSQL_TEST_DB }}?serverVersion=8.0,g' .env
-            - name: print .env content
-              run: cat .env
             - name: Build docker image
               run: docker build -t marketplace_shop_stores .
             - name: Running unit test
