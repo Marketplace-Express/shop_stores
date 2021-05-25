@@ -61,17 +61,12 @@ jobs:
             - name: Create .env file
               run: cp .env.example .env
 
-            - name: Replace environment variables
-              run: |
-                  sed -i 's,DATABASE_URL.*,DATABASE_URL=mysql://${{ env.MYSQL_TEST_USER }}:${{ env.MYSQL_TEST_PASSWORD }}@${{ steps.github-network.outputs.gateway-address }}:${{ job.services.mysql.ports[3306] }}/${{ env.MYSQL_TEST_DB }}?serverVersion=8.0,g' .env
-
-
-            #            - name: Find and Replace
-#              uses: jacobtomlinson/gha-find-replace@master
-#              with:
-#                  find: "DATABASE_URL.*"
-#                  replace: "DATABASE_URL=mysql://${{ env.MYSQL_TEST_USER }}:${{ env.MYSQL_TEST_PASSWORD }}@${{ steps.github-network.outputs.gateway-address }}:${{ job.services.mysql.ports[3306] }}/${{ env.MYSQL_TEST_DB }}?serverVersion=8.0"
-#                  include: ".env"
+            - name: Find and Replace
+              uses: jacobtomlinson/gha-find-replace@master
+              with:
+                  find: "DATABASE_URL.*"
+                  replace: "DATABASE_URL=mysql://${{ env.MYSQL_TEST_USER }}:${{ env.MYSQL_TEST_PASSWORD }}@${{ steps.github-network.outputs.gateway-address }}:${{ job.services.mysql.ports[3306] }}/${{ env.MYSQL_TEST_DB }}?serverVersion=8.0"
+                  include: ".env"
 
             - name: Build docker image
               run: docker build -t marketplace_shop_stores .
