@@ -20,7 +20,7 @@ This service handles stores functionality, including CRUDs, processing and handl
 
 1. Clone the repository:
 ```shell script
-git clone git@gitlab.com:shop_ecommerce/shop_stores.git
+git clone git@github.com:Marketplace-Express/shop_stores.git
 ```
 
 2- Copy ".env.example" file to “.env” under project root directory, then change the parameters to match your preferences, example:
